@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Activity, LogOut, BookOpen, Calendar, Timer, ChevronRight } from 'lucide-react'
+import { Activity, BookOpen, Calendar, Timer, ChevronRight } from 'lucide-react'
 import Layout from '../layouts/Layout'
 import { useAuth } from '../context/AuthContext'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const [stressors, setStressors] = useState([
     {
       id: 1,
@@ -40,11 +40,6 @@ export default function Dashboard() {
   if (!user) {
     navigate('/login')
     return null
-  }
-
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
   }
 
   const reliefStrategies = {
@@ -116,27 +111,18 @@ export default function Dashboard() {
           
           {/* Personalized Greeting Header */}
           <motion.div 
-            className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-12"
+            className="mb-12"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex-1">
+            <div>
               <p className="text-indigo-600 font-semibold text-sm mb-2">Academic Stress Action Plan</p>
               <h1 className="text-4xl md:text-5xl font-bold text-slate-900">Hello {user.name}</h1>
               <p className="text-xl text-slate-500 mt-2">
                 Track stressors, apply Level 1 relief, and stay steady.
               </p>
             </div>
-            <motion.button
-              onClick={handleLogout}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-6 py-3 border border-red-600 text-red-600 font-semibold rounded-2xl hover:bg-red-50 transition-colors"
-            >
-              <LogOut size={20} />
-              Logout
-            </motion.button>
           </motion.div>
 
           {/* Stress Tracker */}

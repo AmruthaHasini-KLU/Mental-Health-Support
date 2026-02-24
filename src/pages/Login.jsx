@@ -131,45 +131,15 @@ export default function Login() {
             navigate('/dashboard')
           }, 1500)
         } else {
-          // Hardcoded demo bypass for admin
-          if (userRole === 'admin' && 
-              formData.email === 'admin@healthsupport.com' && 
-              formData.password === 'Admin@123') {
-            // Manually set user in localStorage for demo
-            const adminUser = {
-              email: 'admin@healthsupport.com',
-              role: 'admin',
-              name: 'System Admin'
-            }
-            localStorage.setItem('healthsupport_user', JSON.stringify(adminUser))
-            setSubmitted(true)
-            navigate('/admin-dashboard')
-            return
-          }
-          
-          // Hardcoded demo bypass for student
-          if (userRole === 'student' && 
-              formData.email === 'student@healthsupport.com' && 
-              formData.password === 'student123') {
-            // Manually set user in localStorage for demo
-            const studentUser = {
-              email: 'student@healthsupport.com',
-              role: 'student',
-              name: 'Demo Student'
-            }
-            localStorage.setItem('healthsupport_user', JSON.stringify(studentUser))
-            setSubmitted(true)
-            navigate('/dashboard')
-            return
-          }
-          
-          // Call original login function if credentials don't match demo values
+          // Call login function from AuthContext
           login(formData.email, formData.password, userRole)
           setSubmitted(true)
-          navigate(userRole === 'admin' ? '/admin-dashboard' : '/dashboard')
+          setTimeout(() => {
+            navigate(userRole === 'admin' ? '/admin-dashboard' : '/dashboard')
+          }, 100)
         }
       } catch (err) {
-        setErrors({ form: err.message || 'Invalid email or password. Please use the demo credentials provided.' })
+        setErrors({ form: err.message || 'Invalid email or password. Please check your credentials.' })
       }
     } else {
       setErrors(newErrors)

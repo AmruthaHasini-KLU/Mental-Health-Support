@@ -35,7 +35,7 @@ export default function Yoga() {
         title: 'Academic Stress Scan', 
         detail: 'Slowly scan from head to toe, releasing tension in the jaw and forehead.', 
         seconds: 300, 
-        image: 'https://images.unsplash.com/photo-1528319725582-ddc0b6c29468?q=80&w=800' 
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_snAwH9Wvx7DiHtPl70GYZO_U_ARpVV8sRw&s' 
       }
     ]
   }
@@ -57,7 +57,7 @@ export default function Yoga() {
         title: 'Neck & Shoulder Softener', 
         detail: 'Gentle neck rolls and shoulder drops to melt away desk-bound fatigue.', 
         seconds: 60, 
-        image: 'https://images.unsplash.com/photo-1552196564-972d4638B0F1?q=80&w=800' 
+        image: 'https://www.shutterstock.com/image-vector/woman-doing-neck-stretch-exercise-260nw-2284184087.jpg' 
       }
     ]
   }

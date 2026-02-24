@@ -73,7 +73,7 @@ export function AuthProvider({ children }) {
       const admin = adminAccounts.find(acc => acc.email === email && acc.password === password)
       if (admin) {
         const userObject = {
-          name: 'Admin',
+          name: 'System Admin',
           email: admin.email,
           role: normalizeRole('admin'),
           loginTime: new Date().toISOString(),
@@ -84,10 +84,30 @@ export function AuthProvider({ children }) {
         throw new Error('Invalid admin credentials')
       }
     } else {
-      // Student login
+      // Check for demo student credentials first
+      const demoStudents = [
+        { email: 'student@healthsupport.com', password: 'student123', name: 'Demo Student', phone: '123-456-7890' },
+        { email: 'john@student.com', password: 'Student@123', name: 'John Doe', phone: '555-0100' },
+        { email: 'sarah@student.com', password: 'Student@123', name: 'Sarah Smith', phone: '555-0101' },
+      ]
+      
+      const demoStudent = demoStudents.find(acc => acc.email === email && acc.password === password)
+      if (demoStudent) {
+        const userObject = {
+          name: demoStudent.name,
+          email: demoStudent.email,
+          phone: demoStudent.phone,
+          role: normalizeRole('student'),
+          loginTime: new Date().toISOString(),
+        }
+        setUser(userObject)
+        return userObject
+      }
+      
+      // Regular student login from registered accounts
       const account = accounts.find(acc => acc.email === email && acc.password === password)
       if (!account) {
-        throw new Error('Invalid email or password')
+        throw new Error('Invalid email or password. Please use demo credentials or sign up.')
       }
 
       const userObject = {
