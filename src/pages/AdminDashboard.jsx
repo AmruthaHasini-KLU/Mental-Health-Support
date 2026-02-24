@@ -1,273 +1,274 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import { Users, AlertTriangle, Activity, BookOpen, ChevronRight, LogOut } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '../layouts/Layout'
-import { useAuth } from '../context/AuthContext'
+import { Users, Calendar, AlertTriangle, Plus, Trash2, Edit, CheckCircle, Clock, Activity, X } from 'lucide-react'
 
 export default function AdminDashboard() {
-  const navigate = useNavigate()
-  const { user, logout, isLoading } = useAuth()
-
-  // Wait for loading state before rendering - prevents "disappearing dashboard" bug
-  if (isLoading) {
-    return (
-      <Layout>
-        <section className="min-h-screen bg-slate-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-            <p className="text-slate-600 font-medium">Loading dashboard...</p>
-          </div>
-        </section>
-      </Layout>
-    )
-  }
-
-  // Protect route - only admin can access
-  if (!user || user.role !== 'admin') {
-    navigate(user ? '/dashboard' : '/login')
-    return null
-  }
-
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
-  // Dashboard Overview Stats
-  const dashboardStats = [
-    { label: 'Total Students', value: '1,247', icon: Users, bgColor: 'bg-blue-50', iconColor: 'text-blue-600' },
-    { label: 'High-Stress Triage Cases', value: '34', icon: AlertTriangle, bgColor: 'bg-red-50', iconColor: 'text-red-600' },
-    { label: 'Yoga Sessions Completed', value: '89', icon: Activity, bgColor: 'bg-green-50', iconColor: 'text-green-600' },
-    { label: 'Library Resource Reads', value: '2,341', icon: BookOpen, bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-  ]
-
-  // Triage Queue Mock Data
-  const [triageQueue] = useState([
-    { id: 1, name: 'Sophia Martinez', category: 'Critical', timeSince: '45 minutes ago' },
-    { id: 2, name: 'Jacob Chen', category: 'Critical', timeSince: '2 hours ago' },
-    { id: 3, name: 'Emma Wilson', category: 'Moderate', timeSince: '30 minutes ago' },
-    { id: 4, name: 'Liam Davis', category: 'Level 1', timeSince: '1 hour ago' },
-    { id: 5, name: 'Olivia Brown', category: 'Moderate', timeSince: '3 hours ago' },
+  // --- STATE FOR MANAGEMENT ---
+  const [specialists, setSpecialists] = useState([
+    { id: 1, name: 'Dr. Aisha Rahman', specialty: 'Academic Burnout', status: 'Active' },
+    { id: 2, name: 'Dr. Luis Moreno', specialty: 'Triage Lead', status: 'Active' },
+    { id: 3, name: 'Dr. Hannah Chen', specialty: 'Anxiety & Stress', status: 'Active' }
   ])
 
-  // Therapist Workload Data
-  const [therapists] = useState([
-    { id: 1, name: 'Dr. Aisha', capacity: 85 },
-    { id: 2, name: 'Dr. Luis', capacity: 72 },
-    { id: 3, name: 'Dr. Hannah', capacity: 91 },
+  const [appointments, setAppointments] = useState([
+    { id: 101, student: 'Amrutha Hasini', dr: 'Dr. Aisha', date: 'Feb 25', status: 'Pending' },
+    { id: 102, student: 'Sophia Martinez', dr: 'Dr. Luis', date: 'Feb 26', status: 'Pending' },
+    { id: 103, student: 'Jacob Chen', dr: 'Dr. Hannah', date: 'Feb 27', status: 'Confirmed' }
   ])
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  }
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [newDr, setNewDr] = useState({ name: '', specialty: '' })
+  const [editingDr, setEditingDr] = useState(null)
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
+  // Community Growth stat
+  const communityGrowth = 1284
 
-  const getCategoryStyles = (category) => {
-    switch (category) {
-      case 'Critical':
-        return 'bg-red-100 text-red-700'
-      case 'Moderate':
-        return 'bg-yellow-100 text-yellow-700'
-      case 'Level 1':
-        return 'bg-green-100 text-green-700'
-      default:
-        return 'bg-slate-100 text-slate-700'
+  // --- OPERATIONS ---
+  const addSpecialist = () => {
+    if (newDr.name && newDr.specialty) {
+      setSpecialists([...specialists, { ...newDr, id: Date.now(), status: 'Active' }])
+      setShowAddModal(false)
+      setNewDr({ name: '', specialty: '' })
     }
   }
 
-  const getCapacityColor = (capacity) => {
-    if (capacity >= 85) return 'bg-red-500'
-    if (capacity >= 70) return 'bg-yellow-500'
-    return 'bg-green-500'
+  const deleteSpecialist = (id) => {
+    setSpecialists(specialists.filter(dr => dr.id !== id))
+  }
+
+  const openEditModal = (specialist) => {
+    setEditingDr(specialist)
+    setShowEditModal(true)
+  }
+
+  const updateSpecialist = () => {
+    if (editingDr && editingDr.name && editingDr.specialty) {
+      setSpecialists(specialists.map(dr => 
+        dr.id === editingDr.id ? editingDr : dr
+      ))
+      setShowEditModal(false)
+      setEditingDr(null)
+    }
+  }
+
+  const confirmAppointment = (id) => {
+    setAppointments(appointments.map(app => 
+      app.id === id ? { ...app, status: 'Confirmed' } : app
+    ))
   }
 
   return (
     <Layout>
-      <section className="min-h-screen bg-slate-50 py-8 md:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          {/* Header */}
-          <motion.div
-            className="flex justify-between items-start mb-12"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+      <div className="min-h-screen bg-slate-50 py-12 px-4 md:px-10">
+        <div className="max-w-7xl mx-auto">
+          
+          <header className="flex justify-between items-center mb-12">
             <div>
-              <p className="text-indigo-600 font-semibold text-sm mb-2 uppercase tracking-wide">Admin Dashboard</p>
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">
-                Welcome, {user.name}
-              </h1>
-              <p className="text-lg text-slate-600">
-                Monitor triage cases, track therapist workload, and manage system operations
-              </p>
+              <h1 className="text-4xl font-black text-slate-900">Admin Operations</h1>
+              <p className="text-slate-500 font-medium">Manage specialists and community appointments.</p>
             </div>
-            <motion.button
-              onClick={handleLogout}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-6 py-3 bg-red-50 border border-red-200 text-red-600 font-semibold rounded-[2.5rem] hover:bg-red-100 transition-colors"
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-colors"
             >
-              <LogOut size={20} />
-              Logout
-            </motion.button>
-          </motion.div>
+              <Plus size={20} /> Add Doctor
+            </button>
+          </header>
 
-          {/* Dashboard Stats Cards */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {dashboardStats.map((stat, index) => {
-              const Icon = stat.icon
-              return (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className={`${stat.bgColor} border border-slate-200 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-shadow`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-2xl ${stat.bgColor} border border-slate-300`}>
-                      <Icon className={`w-6 h-6 ${stat.iconColor}`} />
-                    </div>
-                  </div>
-                  <p className="text-slate-600 text-sm font-semibold mb-2">{stat.label}</p>
-                  <p className="text-4xl font-bold text-slate-900">{stat.value}</p>
-                </motion.div>
-              )
-            })}
-          </motion.div>
-
-          {/* Main Content: Triage Queue + Therapist Workload */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            {/* Triage Management System */}
+          {/* Community Growth Stat Card */}
+          <div className="mb-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="lg:col-span-2 bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[3rem] p-8 shadow-lg text-white"
             >
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Triage Queue</h2>
-              
-              {/* Triage Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-4 px-4 font-semibold text-slate-700 text-sm">Student Name</th>
-                      <th className="text-left py-4 px-4 font-semibold text-slate-700 text-sm">Stress Category</th>
-                      <th className="text-left py-4 px-4 font-semibold text-slate-700 text-sm">Time Since Request</th>
-                      <th className="text-left py-4 px-4 font-semibold text-slate-700 text-sm">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {triageQueue.map((item, index) => (
-                      <motion.tr
-                        key={item.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                      >
-                        <td className="py-4 px-4">
-                          <p className="font-semibold text-slate-900">{item.name}</p>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryStyles(item.category)}`}>
-                            {item.category}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <p className="text-slate-600 text-sm">{item.timeSince}</p>
-                        </td>
-                        <td className="py-4 px-4">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => navigate(`/triage/${item.id}`)}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-100 transition-colors"
-                          >
-                            Priority Review
-                            <ChevronRight size={16} />
-                          </motion.button>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-
-            {/* Therapist Workload Tracker */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm h-fit"
-            >
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Therapist Workload</h2>
-              
-              <div className="space-y-6">
-                {therapists.map((therapist, index) => (
-                  <motion.div
-                    key={therapist.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-semibold text-slate-900">{therapist.name}</p>
-                      <span className="text-sm font-semibold text-slate-600">{therapist.capacity}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                      <motion.div
-                        className={`h-full rounded-full transition-all ${getCapacityColor(therapist.capacity)}`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${therapist.capacity}%` }}
-                        transition={{ delay: 0.5 + index * 0.1, duration: 0.8 }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-500 mt-2">
-                      {therapist.capacity >= 85 ? 'Near Capacity' : therapist.capacity >= 70 ? 'High Load' : 'Available'}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Quick Stats */}
-              <div className="mt-8 pt-8 border-t border-slate-200">
-                <p className="text-sm font-semibold text-slate-700 mb-3">System Health</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Avg. Capacity</span>
-                    <span className="font-semibold text-slate-900">
-                      {Math.round(therapists.reduce((sum, t) => sum + t.capacity, 0) / therapists.length)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Cases in Queue</span>
-                    <span className="font-semibold text-slate-900">{triageQueue.length}</span>
-                  </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-indigo-100 font-semibold mb-2">Community Growth</p>
+                  <h2 className="text-5xl font-black">{communityGrowth.toLocaleString()}</h2>
+                  <p className="text-indigo-100 mt-2">Students joined the platform</p>
+                </div>
+                <div className="bg-white/20 p-6 rounded-3xl">
+                  <Users size={48} className="text-white" />
                 </div>
               </div>
             </motion.div>
           </div>
 
+          <div className="grid lg:grid-cols-3 gap-10">
+            {/* APPOINTMENT MANAGEMENT */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
+                  <Calendar className="text-indigo-600" /> Manage Appointments
+                </h3>
+                <div className="space-y-4">
+                  {appointments.map(app => (
+                    <motion.div 
+                      key={app.id} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100"
+                    >
+                      <div>
+                        <p className="font-bold text-slate-900">{app.student}</p>
+                        <p className="text-xs text-slate-400">{app.date} • Assigned: {app.dr}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black ${app.status === 'Confirmed' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
+                          {app.status}
+                        </span>
+                        {app.status === 'Pending' && (
+                          <button 
+                            onClick={() => confirmAppointment(app.id)} 
+                            className="p-2 bg-white text-green-600 rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm"
+                          >
+                            <CheckCircle size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* SPECIALIST DIRECTORY (CRUD) */}
+            <aside className="bg-white p-8 rounded-[3.5rem] shadow-sm border border-slate-100">
+              <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
+                <Users className="text-indigo-600" /> Specialist Directory
+              </h3>
+              <div className="space-y-6">
+                <AnimatePresence>
+                  {specialists.map(dr => (
+                    <motion.div 
+                      key={dr.id} 
+                      initial={{ opacity: 0, scale: 0.9 }} 
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100"
+                    >
+                      <p className="font-bold text-slate-900">{dr.name}</p>
+                      <p className="text-xs text-slate-500 mb-4">{dr.specialty}</p>
+                      <div className="flex gap-2 justify-end pt-4 border-t border-slate-200">
+                        <button 
+                          onClick={() => openEditModal(dr)}
+                          className="p-2 bg-white text-slate-400 hover:text-indigo-600 rounded-lg shadow-sm transition-colors"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => deleteSpecialist(dr.id)} 
+                          className="p-2 bg-white text-slate-400 hover:text-red-600 rounded-lg shadow-sm transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </aside>
+          </div>
         </div>
-      </section>
+      </div>
+
+      {/* ADD SPECIALIST MODAL */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[3rem] p-10 max-w-md w-full shadow-2xl"
+            >
+              <h2 className="text-3xl font-black mb-6">New Specialist</h2>
+              <div className="space-y-4 mb-8">
+                <input 
+                  type="text" 
+                  placeholder="Doctor Name" 
+                  value={newDr.name} 
+                  onChange={(e) => setNewDr({...newDr, name: e.target.value})}
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:border-indigo-300"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Specialty (e.g. Anxiety)" 
+                  value={newDr.specialty} 
+                  onChange={(e) => setNewDr({...newDr, specialty: e.target.value})}
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:border-indigo-300"
+                />
+              </div>
+              <div className="flex gap-4">
+                <button 
+                  onClick={addSpecialist} 
+                  className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Add to Team
+                </button>
+                <button 
+                  onClick={() => setShowAddModal(false)} 
+                  className="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* EDIT SPECIALIST MODAL */}
+      <AnimatePresence>
+        {showEditModal && editingDr && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[3rem] p-10 max-w-md w-full shadow-2xl"
+            >
+              <h2 className="text-3xl font-black mb-6">Edit Specialist</h2>
+              <div className="space-y-4 mb-8">
+                <input 
+                  type="text" 
+                  placeholder="Doctor Name" 
+                  value={editingDr.name} 
+                  onChange={(e) => setEditingDr({...editingDr, name: e.target.value})}
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:border-indigo-300"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Specialty" 
+                  value={editingDr.specialty} 
+                  onChange={(e) => setEditingDr({...editingDr, specialty: e.target.value})}
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:border-indigo-300"
+                />
+              </div>
+              <div className="flex gap-4">
+                <button 
+                  onClick={updateSpecialist} 
+                  className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Update
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setEditingDr(null)
+                  }} 
+                  className="flex-1 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </Layout>
   )
 }
