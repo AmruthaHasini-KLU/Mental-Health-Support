@@ -1,9 +1,17 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { BookOpen, Music, FileText, Video, Zap, Heart, ExternalLink } from 'lucide-react'
+import { BookOpen, Music, FileText, Video, Zap, Heart, ExternalLink, Lightbulb, Stethoscope } from 'lucide-react'
 
 export default function Resources() {
+  const [doctorTips, setDoctorTips] = useState([])
+
+  useEffect(() => {
+    const tips = JSON.parse(localStorage.getItem('doctor_tips') || '[]')
+    setDoctorTips(tips)
+  }, [])
+
   const resources = [
     {
       title: 'Understanding Stress & How to Manage It',
@@ -117,8 +125,6 @@ export default function Resources() {
 
   const tags = ['stress', 'anxiety', 'depression', 'sleep', 'mindfulness', 'general', 'self-esteem', 'relationships']
 
-  // ... (Keep the rest of your logic like containerVariants, itemVariants, getTagColor, and openResource the same)
-
   const getTagColor = (tag) => {
     const colorMap = {
       stress: 'from-blue-100 to-blue-200 text-blue-700',
@@ -148,18 +154,90 @@ export default function Resources() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Resource Hub
+              Resource Hub & Expert Tips
             </h1>
             <p className="text-xl text-slate-500 max-w-3xl mx-auto">
-              Curated articles and exercises to help you manage academic stress and physical fatigue. Verified sources only.
+              Curated articles, exercises, and professional insights to help you manage academic stress and mental wellness. Verified sources only.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Grid - Rest of the component remains the same */}
+      {/* Doctor Tips Section */}
+      {doctorTips.length > 0 && (
+        <section className="py-16 bg-gradient-to-b from-indigo-50 to-white border-b border-indigo-100">
+          <div className="max-w-7xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                  <Lightbulb size={24} className="text-white" />
+                </div>
+                <h2 className="text-3xl font-bold text-slate-900">Professional Tips from Our Doctors</h2>
+              </div>
+              <p className="text-slate-600">Practical advice and insights from licensed mental health professionals.</p>
+            </motion.div>
+
+            <motion.div
+              className="grid md:grid-cols-2 gap-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: { transition: { staggerChildren: 0.1 } }
+              }}
+            >
+              {doctorTips.map((tip, index) => (
+                <motion.div
+                  key={tip.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  className="bg-white border border-indigo-200 rounded-2xl p-6 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Stethoscope size={20} className="text-indigo-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-900">{tip.doctorName}</h3>
+                      <p className="text-xs text-indigo-600 font-medium">{tip.doctorSpecialty}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-slate-700 leading-relaxed mb-4">{tip.content}</p>
+
+                  <p className="text-xs text-slate-400">
+                    {new Date(tip.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Resources Grid */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">External Resources & Tools</h2>
+            <p className="text-slate-600">Explore verified resources from trusted mental health organizations.</p>
+          </motion.div>
+
           <motion.div
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             initial="hidden"

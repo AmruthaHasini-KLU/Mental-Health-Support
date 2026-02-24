@@ -34,7 +34,8 @@ export default function Dashboard() {
   const [formData, setFormData] = useState({
     title: '',
     type: 'Exams',
-    intensity: 'Moderate'
+    intensity: 'Moderate',
+    customType: '' // For 'Other' option
   })
 
   if (!user) {
@@ -62,10 +63,35 @@ export default function Dashboard() {
       { title: 'Priority Map', detail: 'Define the next smallest deliverable', icon: Calendar },
       { title: 'Pomodoro Sprint', detail: 'Start with a 25-minute kickoff', icon: Timer },
       { title: 'Active Recall', detail: 'Summarize progress after each sprint', icon: BookOpen },
+    ],
+    Financial: [
+      { title: 'Budget Plan', detail: 'Track expenses and prioritize needs', icon: Calendar },
+      { title: 'Time Blocking', detail: 'Set aside time for financial planning', icon: Timer },
+      { title: 'Resource Check', detail: 'Research scholarships and aid options', icon: BookOpen },
+    ],
+    'Personal/Family': [
+      { title: 'Time Blocking', detail: 'Schedule regular check-ins with loved ones', icon: Calendar },
+      { title: 'Pomodoro Sprint', detail: 'Take short breaks to process emotions', icon: Timer },
+      { title: 'Active Recall', detail: 'Journal about your feelings', icon: BookOpen },
+    ],
+    'Social/Peer Pressure': [
+      { title: 'Priority Map', detail: 'Identify your true values and priorities', icon: Calendar },
+      { title: 'Time Blocking', detail: 'Schedule time for authentic connections', icon: Timer },
+      { title: 'Active Recall', detail: 'Reflect on positive relationships', icon: BookOpen },
+    ],
+    Health: [
+      { title: 'Time Blocking', detail: 'Schedule regular exercise and meals', icon: Calendar },
+      { title: 'Pomodoro Sprint', detail: 'Take movement breaks every hour', icon: Timer },
+      { title: 'Active Recall', detail: 'Track symptoms and wellness patterns', icon: BookOpen },
+    ],
+    Other: [
+      { title: 'Pomodoro Sprint', detail: 'Break the challenge into small steps', icon: Timer },
+      { title: 'Priority Map', detail: 'Identify what you can control', icon: Calendar },
+      { title: 'Active Recall', detail: 'Reflect on past successes', icon: BookOpen },
     ]
   }
 
-  const stressorTypes = ['Exams', 'Deadlines', 'Presentations', 'Projects']
+  const stressorTypes = ['Exams', 'Deadlines', 'Presentations', 'Projects', 'Financial', 'Personal/Family', 'Social/Peer Pressure', 'Health', 'Other']
   const stressLevels = ['Low', 'Moderate', 'High']
 
   const handleFormChange = (event) => {
@@ -79,16 +105,27 @@ export default function Dashboard() {
       return
     }
 
+    // Use customType if 'Other' is selected, otherwise use type
+    const finalType = formData.type === 'Other' && formData.customType.trim() 
+      ? formData.customType.trim() 
+      : formData.type
+
     const nextStressor = {
       id: Date.now(),
       title: formData.title.trim(),
-      type: formData.type,
+      type: finalType,
       intensity: formData.intensity,
       createdAt: 'Just now'
     }
 
     setStressors((prev) => [nextStressor, ...prev])
-    setFormData({ title: '', type: formData.type, intensity: formData.intensity })
+    
+    // Save to localStorage for Admin Therapy Hub sync
+    const existingStressors = JSON.parse(localStorage.getItem('student_stressors') || '[]')
+    existingStressors.push(nextStressor)
+    localStorage.setItem('student_stressors', JSON.stringify(existingStressors))
+    
+    setFormData({ title: '', type: formData.type, intensity: formData.intensity, customType: '' })
   }
 
   const containerVariants = {
@@ -117,9 +154,9 @@ export default function Dashboard() {
             transition={{ duration: 0.5 }}
           >
             <div>
-              <p className="text-indigo-600 font-semibold text-sm mb-2">Academic Stress Action Plan</p>
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900">Hello {user.name}</h1>
-              <p className="text-xl text-slate-500 mt-2">
+              <p className="font-semibold text-sm mb-2" style={{ color: 'var(--primary-blue)' }}>Academic Stress Action Plan</p>
+              <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>Hello {user.name}</h1>
+              <p className="text-xl mt-2" style={{ color: 'var(--text-secondary)' }}>
                 Track stressors, apply Level 1 relief, and stay steady.
               </p>
             </div>
@@ -150,56 +187,78 @@ export default function Dashboard() {
 
                 <motion.form
                   onSubmit={handleAddStressor}
-                  className="grid grid-cols-1 md:grid-cols-5 gap-4 p-6 border border-slate-100 rounded-2xl bg-white mb-6"
+                  className="grid grid-cols-1 gap-4 p-6 border border-slate-100 rounded-2xl bg-white mb-6"
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
                 >
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-semibold text-slate-700">Stressor</label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleFormChange}
-                      placeholder="Exams, deadlines, projects"
-                      className="mt-2 w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-semibold text-slate-700">Stressor</label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleFormChange}
+                        placeholder="Exams, deadlines, projects"
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
+                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Type</label>
+                      <select
+                        name="type"
+                        value={formData.type}
+                        onChange={handleFormChange}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
+                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                      >
+                        {stressorTypes.map((type) => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Intensity</label>
+                      <select
+                        name="intensity"
+                        value={formData.intensity}
+                        onChange={handleFormChange}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
+                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                      >
+                        {stressLevels.map((level) => (
+                          <option key={level} value={level}>{level}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="submit"
+                        className="w-full px-4 py-2 text-white font-semibold rounded-xl transition-colors"
+                        style={{ backgroundColor: 'var(--primary-blue)' }}
+                      >
+                        Add Stressor
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700">Type</label>
-                    <select
-                      name="type"
-                      value={formData.type}
-                      onChange={handleFormChange}
-                      className="mt-2 w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                    >
-                      {stressorTypes.map((type) => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700">Intensity</label>
-                    <select
-                      name="intensity"
-                      value={formData.intensity}
-                      onChange={handleFormChange}
-                      className="mt-2 w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                    >
-                      {stressLevels.map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      type="submit"
-                      className="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
-                    >
-                      Add Stressor
-                    </button>
-                  </div>
+                  
+                  {/* Custom Type Input - Shows when 'Other' is selected */}
+                  {formData.type === 'Other' && (
+                    <div className="mt-2">
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Specify custom stressor type</label>
+                      <input
+                        type="text"
+                        name="customType"
+                        value={formData.customType}
+                        onChange={handleFormChange}
+                        placeholder="e.g., Homesickness, Loneliness, Career uncertainty"
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
+                        style={{ borderColor: 'var(--primary-blue)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+                      />
+                    </div>
+                  )}
                 </motion.form>
 
                 <motion.div
@@ -212,16 +271,17 @@ export default function Dashboard() {
                     <motion.div
                       key={stressor.id}
                       variants={itemVariants}
-                      className="p-6 border border-slate-100 rounded-2xl bg-white"
+                      className="p-6 border rounded-2xl transition-colors"
+                      style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                     >
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                          <h3 className="text-xl font-bold text-slate-900">{stressor.title}</h3>
-                          <p className="text-sm text-slate-500 mt-1">
+                          <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{stressor.title}</h3>
+                          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
                             {stressor.type} · {stressor.intensity} · {stressor.createdAt}
                           </p>
                         </div>
-                        <span className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
                           <Activity size={14} />
                           Level 1 Relief
                         </span>
@@ -233,13 +293,14 @@ export default function Dashboard() {
                           return (
                             <div
                               key={strategy.title}
-                              className="p-4 border border-slate-100 rounded-xl bg-slate-50"
+                              className="p-4 border rounded-xl transition-colors"
+                              style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
                             >
-                              <div className="flex items-center gap-2 text-slate-700 font-semibold">
-                                <StrategyIcon size={16} className="text-indigo-600" />
+                              <div className="flex items-center gap-2 font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                <StrategyIcon size={16} style={{ color: 'var(--primary-blue)' }} />
                                 {strategy.title}
                               </div>
-                              <p className="text-sm text-slate-500 mt-2">{strategy.detail}</p>
+                              <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>{strategy.detail}</p>
                             </div>
                           )}
                         )}

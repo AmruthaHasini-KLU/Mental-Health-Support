@@ -67,7 +67,7 @@ export default function Hero() {
                 Get Started
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/counseling" className="btn-secondary inline-flex items-center justify-center gap-2">
+              <Link to="/therapy" className="btn-secondary inline-flex items-center justify-center gap-2">
                 Book Session
               </Link>
             </motion.div>

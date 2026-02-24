@@ -7,7 +7,7 @@ export default function Footer() {
   const quickLinks = [
     { label: 'Home', path: '/' },
     { label: 'Resources', path: '/resources' },
-    { label: 'Counseling', path: '/counseling' },
+    { label: 'Therapy', path: '/therapy' },
     { label: 'Support Groups', path: '/support-groups' },
   ]
 

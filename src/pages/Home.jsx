@@ -129,7 +129,7 @@ export default function Home() {
                   Get Started
                 </button>
                 <button
-                  onClick={() => navigate('/counseling')}
+                  onClick={() => navigate('/therapy')}
                   className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl border border-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageCircle size={20} />

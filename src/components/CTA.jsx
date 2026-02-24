@@ -70,7 +70,7 @@ export default function CTA() {
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/counseling"
+              to="/therapy"
               className="px-8 py-4 bg-white/10 text-white font-semibold rounded-2xl border-2 border-white/20 hover:border-white/50 hover:bg-white/20 transition-all duration-300 inline-flex items-center justify-center gap-2"
             >
               Learn More

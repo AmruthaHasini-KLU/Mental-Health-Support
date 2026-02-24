@@ -11,7 +11,8 @@ export default function Login() {
   const { signup, login } = useAuth()
   
   const [isSignUp, setIsSignUp] = useState(false)
-  const [userRole, setUserRole] = useState('student') // 'student' or 'admin'
+  const [userRole, setUserRole] = useState('student') // For login: 'student', 'doctor', or 'admin'
+  const [signupRole, setSignupRole] = useState('student') // For signup: 'student' or 'doctor'
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -57,6 +58,7 @@ export default function Login() {
     name: '',
     confirmPassword: '',
     phone: '',
+    studentId: '', // Only for students
   })
 
   const handleChange = (e) => {
@@ -74,6 +76,11 @@ export default function Login() {
       newErrors.email = 'Email is required'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email'
+    } else if (isSignUp && signupRole === 'doctor') {
+      // Validate doctor email format: docname@gmail.com
+      if (!formData.email.startsWith('dr.') || !formData.email.endsWith('@gmail.com')) {
+        newErrors.email = 'Doctor email must follow format: dr.<name>@gmail.com'
+      }
     }
 
     if (!formData.password) {
@@ -104,6 +111,11 @@ export default function Login() {
       } else if (!/^\d{10,}/.test(formData.phone.replace(/\D/g, ''))) {
         newErrors.phone = 'Please enter a valid phone number'
       }
+
+      // Student ID is required for students
+      if (signupRole === 'student' && !formData.studentId) {
+        newErrors.studentId = 'Student ID is required'
+      }
     }
 
     return newErrors
@@ -125,17 +137,28 @@ export default function Login() {
             email: formData.email,
             password: formData.password,
             phone: formData.phone,
+            studentId: signupRole === 'student' ? formData.studentId : undefined,
+            role: signupRole, // Pass the selected role
           })
           setSubmitted(true)
+          const redirectPath = {
+            'student': '/student/dashboard',
+            'doctor': '/doctor/dashboard'
+          }
           setTimeout(() => {
-            navigate('/dashboard')
+            navigate(redirectPath[signupRole] || '/student/dashboard')
           }, 1500)
         } else {
           // Call login function from AuthContext
           login(formData.email, formData.password, userRole)
           setSubmitted(true)
+          const redirectPath = {
+            'admin': '/admin/dashboard',
+            'doctor': '/doctor/dashboard',
+            'student': '/student/dashboard'
+          }
           setTimeout(() => {
-            navigate(userRole === 'admin' ? '/admin-dashboard' : '/dashboard')
+            navigate(redirectPath[userRole] || '/student/dashboard')
           }, 100)
         }
       } catch (err) {
@@ -299,11 +322,11 @@ export default function Login() {
 
                 {/* Role Selector - Only show on login, not signup */}
                 {!isSignUp && (
-                  <motion.div className="mb-6 flex gap-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }}>
+                  <motion.div className="mb-6 flex gap-2 flex-wrap" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }}>
                     <button
                       type="button"
                       onClick={() => setUserRole('student')}
-                      className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
+                      className={`flex-1 min-w-24 py-3 rounded-xl font-semibold transition-all ${
                         userRole === 'student'
                           ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-soft-lg'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -313,8 +336,19 @@ export default function Login() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => setUserRole('doctor')}
+                      className={`flex-1 min-w-24 py-3 rounded-xl font-semibold transition-all ${
+                        userRole === 'doctor'
+                          ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-soft-lg'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      Doctor
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setUserRole('admin')}
-                      className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
+                      className={`flex-1 min-w-24 py-3 rounded-xl font-semibold transition-all ${
                         userRole === 'admin'
                           ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-soft-lg'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -334,8 +368,54 @@ export default function Login() {
                   </motion.div>
                 )}
 
+                {/* Doctor Credentials Hint */}
+                {!isSignUp && userRole === 'doctor' && (
+                  <motion.div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl space-y-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <p className="text-xs text-indigo-700 font-semibold">Demo Doctor Credentials:</p>
+                    <div className="text-xs text-indigo-600 space-y-1 mt-1">
+                      <p>Email: dr.sarah@gmail.com | Password: docpass123</p>
+                      <p>Email: dr.michael@gmail.com | Password: docpass123</p>
+                      <p>Email: dr.emily@gmail.com | Password: docpass123</p>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Sign-Up Role Selection */}
+                  {isSignUp && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">I am a...</label>
+                      <div className="flex gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer flex-1">
+                          <input
+                            type="radio"
+                            name="signupRole"
+                            value="student"
+                            checked={signupRole === 'student'}
+                            onChange={(e) => setSignupRole(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-sm font-medium text-gray-700">Student</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer flex-1">
+                          <input
+                            type="radio"
+                            name="signupRole"
+                            value="doctor"
+                            checked={signupRole === 'doctor'}
+                            onChange={(e) => setSignupRole(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-sm font-medium text-gray-700">Doctor</span>
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2">
+                        {signupRole === 'doctor' ? '💉 You will receive a doctor dashboard after verification.' : '👨‍🎓 You will get access to all wellness features.'}
+                      </p>
+                    </motion.div>
+                  )}
+
                   {/* Name Field */}
                   {isSignUp && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -367,6 +447,18 @@ export default function Login() {
                         <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.phone ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                       </div>
                       {errors.phone && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.phone}</p>}
+                    </motion.div>
+                  )}
+
+                  {/* Student ID Field - Only for Students */}
+                  {isSignUp && signupRole === 'student' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+                      <label className="block text-sm font-semibold text-gray-900 mb-2">Student ID</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
+                        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="e.g., STU-2024-001" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.studentId ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                      </div>
+                      {errors.studentId && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.studentId}</p>}
                     </motion.div>
                   )}
 
