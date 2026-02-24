@@ -141,15 +141,15 @@ export default function Therapy() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-50 py-12 px-4 md:py-20 font-sans">
+      <div className="min-h-screen py-12 px-4 md:py-20 font-sans transition-colors duration-300" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
         <div className="max-w-6xl mx-auto">
           
           <header className="mb-16 text-center">
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest mb-4">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)', color: 'var(--primary-blue)', border: '1px solid' }}>
               <Sparkles size={14} /> Therapy Hub
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Professional Therapy & Wellness</h1>
-            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight" style={{ color: 'var(--text-primary)' }}>Professional Therapy & Wellness</h1>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               Connect with our experienced therapists for personalized support and guidance.
             </p>
           </header>
@@ -157,15 +157,16 @@ export default function Therapy() {
           {/* 1. THERAPY BOOKING SECTION */}
           <div className="grid md:grid-cols-3 gap-8 mb-24">
             {therapists.map((therapist) => (
-              <div key={therapist.id} className="bg-white border-2 border-slate-100 rounded-[2.5rem] p-8 transition-all shadow-sm hover:shadow-lg hover:border-indigo-200">
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-2xl flex items-center justify-center mb-6 text-indigo-600">
+              <div key={therapist.id} className="border-2 rounded-[2.5rem] p-8 transition-all shadow-sm hover:shadow-lg" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
                   <User size={30} />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 leading-tight mb-2">{therapist.name}</h3>
-                <p className="text-indigo-600 font-bold text-sm mb-8">{therapist.specialty}</p>
+                <h3 className="text-2xl font-bold leading-tight mb-2" style={{ color: 'var(--text-primary)' }}>{therapist.name}</h3>
+                <p className="font-bold text-sm mb-8" style={{ color: 'var(--primary-blue)' }}>{therapist.specialty}</p>
                 <button 
                   onClick={() => handleOpenBookingModal(therapist)} 
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-md"
+                  className="w-full py-4 text-white rounded-2xl font-black transition-all shadow-md"
+                  style={{ backgroundColor: 'var(--primary-blue)' }}
                 >
                   Book Therapy
                 </button>
@@ -174,30 +175,30 @@ export default function Therapy() {
           </div>
 
           {/* 2. WELLNESS LIBRARY */}
-          <section className="bg-white rounded-[3.5rem] p-10 md:p-16 border border-slate-100 shadow-sm">
+          <section className="rounded-[3.5rem] p-10 md:p-16 border transition-colors" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
             <div className="flex items-center gap-4 mb-16">
-              <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600">
+              <div className="p-4 rounded-2xl" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
                 <Bookmark size={32} />
               </div>
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight">The Wellness Library</h2>
+              <h2 className="text-4xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>The Wellness Library</h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
               {famousBooks.map((book) => (
-                <div key={book.title} className="flex flex-col h-full group bg-slate-50/50 p-8 rounded-[2rem] border border-transparent hover:border-indigo-100 hover:bg-white transition-all shadow-sm">
+                <div key={book.title} className="flex flex-col h-full group p-8 rounded-[2rem] border transition-all" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
                   <div className="mb-4">
-                    <span className="px-3 py-1 bg-white text-slate-400 text-[10px] font-black tracking-widest rounded-lg border border-slate-100 uppercase">
+                    <span className="px-3 py-1 text-[10px] font-black tracking-widest rounded-lg border uppercase transition-colors" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-secondary)', borderColor: 'var(--border-color)' }}>
                       {book.tag}
                     </span>
                   </div>
-                  <h4 className="text-xl font-bold text-slate-900 mb-2 leading-tight group-hover:text-indigo-600 transition-colors">{book.title}</h4>
-                  <p className="text-sm font-bold text-slate-400 mb-6 italic">by {book.author}</p>
+                  <h4 className="text-xl font-bold mb-2 leading-tight transition-colors group-hover:" style={{ color: 'var(--text-primary)' }}>{book.title}</h4>
+                  <p className="text-sm font-bold mb-6 italic" style={{ color: 'var(--text-secondary)' }}>by {book.author}</p>
                   
                   <div className="mt-auto space-y-4">
-                    <button onClick={() => setActiveBook(book)} className="flex items-center gap-2 text-indigo-600 text-xs font-bold group/btn">
+                    <button onClick={() => setActiveBook(book)} className="flex items-center gap-2 text-xs font-bold group/btn" style={{ color: 'var(--primary-blue)' }}>
                       READ SUMMARY <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                     </button>
-                    <a href={book.shopLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-900 hover:text-white transition-all">
+                    <a href={book.shopLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 border text-xs font-bold rounded-xl transition-all" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
                       <ShoppingCart size={14} /> SHOP ON GOOGLE
                     </a>
                   </div>
@@ -215,25 +216,26 @@ export default function Therapy() {
                 initial={{ scale: 0.95, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl" 
+                className="rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl border" 
+                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-slate-900">Book Therapy</h3>
-                  <button onClick={() => setShowBookingModal(false)} className="text-slate-400 hover:text-slate-600">
+                  <h3 className="text-2xl font-black" style={{ color: 'var(--text-primary)' }}>Book Therapy</h3>
+                  <button onClick={() => setShowBookingModal(false)} style={{ color: 'var(--text-tertiary)' }}>
                     <X size={24} />
                   </button>
                 </div>
 
-                <div className="mb-6 p-4 bg-indigo-50 rounded-2xl">
-                  <p className="text-sm text-slate-600 mb-1">Therapist</p>
-                  <p className="font-bold text-slate-900">{bookingForm.doctorName}</p>
+                <div className="mb-6 p-4 rounded-2xl" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                  <p className="text-sm mb-1" style={{ color: 'var(--text-tertiary)' }}>Therapist</p>
+                  <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{bookingForm.doctorName}</p>
                 </div>
 
                 <div className="space-y-6 mb-8">
                   <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                      <Phone size={16} className="text-indigo-600" />
+                    <label className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                      <Phone size={16} style={{ color: 'var(--primary-blue)' }} />
                       Contact Number
                     </label>
                     <input 
@@ -241,14 +243,15 @@ export default function Therapy() {
                       value={bookingForm.contactNumber}
                       onChange={(e) => setBookingForm({...bookingForm, contactNumber: e.target.value})}
                       placeholder="+1 (555) 123-4567"
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all" 
+                      className="w-full p-4 rounded-2xl font-medium outline-none transition-all"
+                      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', border: '1px solid' }}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                      <Users size={16} className="text-indigo-600" />
+                    <label className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                      <Users size={16} style={{ color: 'var(--primary-blue)' }} />
                       Number of People Attending
                     </label>
                     <input 
@@ -257,15 +260,16 @@ export default function Therapy() {
                       max="10"
                       value={bookingForm.numberOfPeople}
                       onChange={(e) => setBookingForm({...bookingForm, numberOfPeople: parseInt(e.target.value) || 1})}
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all" 
+                      className="w-full p-4 rounded-2xl font-medium outline-none transition-all"
+                      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', border: '1px solid' }}
                       required
                     />
-                    <p className="text-xs text-slate-500 mt-2">Include yourself and any companions (max 10)</p>
+                    <p className="text-xs mt-2" style={{ color: 'var(--text-tertiary)' }}>Include yourself and any companions (max 10)</p>
                   </div>
 
                   <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                      <Check size={16} className="text-indigo-600" />
+                    <label className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                      <Check size={16} style={{ color: 'var(--primary-blue)' }} />
                       Preferred Date
                     </label>
                     <input 
@@ -273,20 +277,22 @@ export default function Therapy() {
                       value={bookingForm.requestedDate}
                       onChange={(e) => setBookingForm({...bookingForm, requestedDate: e.target.value})}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all" 
+                      className="w-full p-4 rounded-2xl font-medium outline-none transition-all"
+                      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', border: '1px solid' }}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                      <Clock size={16} className="text-indigo-600" />
+                    <label className="text-sm font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                      <Clock size={16} style={{ color: 'var(--primary-blue)' }} />
                       Preferred Time Slot
                     </label>
                     <select 
                       value={bookingForm.timeSlot}
                       onChange={(e) => setBookingForm({...bookingForm, timeSlot: e.target.value})}
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all" 
+                      className="w-full p-4 rounded-2xl font-medium outline-none transition-all"
+                      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', border: '1px solid' }}
                       required
                     >
                       <option value="">Select a time slot</option>
@@ -303,7 +309,8 @@ export default function Therapy() {
                 <button 
                   onClick={handleConfirmBooking}
                   disabled={!bookingForm.contactNumber || bookingForm.numberOfPeople < 1 || !bookingForm.requestedDate || !bookingForm.timeSlot}
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-full py-4 rounded-2xl font-black shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  style={{ backgroundColor: 'var(--primary-blue)', color: '#fff' }}
                 >
                   Confirm Booking
                 </button>
@@ -320,18 +327,20 @@ export default function Therapy() {
                 initial={{ scale: 0.8, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
                 exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-white rounded-[3rem] p-12 max-w-sm w-full text-center shadow-2xl border-4 border-green-50"
+                className="rounded-[3rem] p-12 max-w-sm w-full text-center shadow-2xl border-4"
+                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--bg-tertiary)' }}
               >
-                <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
                   <Check size={40} strokeWidth={3} />
                 </div>
-                <h2 className="text-3xl font-black text-slate-900 mb-3">Appointment Booked Successfully!</h2>
-                <p className="text-slate-600 font-medium mb-8 leading-relaxed">
+                <h2 className="text-3xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>Appointment Booked Successfully!</h2>
+                <p className="font-medium mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   Your therapy request has been sent. Our admin team will review and confirm your appointment shortly.
                 </p>
                 <button 
                   onClick={() => setBookingSuccess(false)} 
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition-colors"
+                  className="w-full py-4 rounded-2xl font-black transition-colors"
+                  style={{ backgroundColor: 'var(--primary-blue)', color: '#fff' }}
                 >
                   Done
                 </button>
@@ -346,17 +355,18 @@ export default function Therapy() {
             <motion.div 
               initial={{ scale: 0.9, y: 30 }} 
               animate={{ scale: 1, y: 0 }} 
-              className="bg-white rounded-[3rem] p-10 max-w-lg w-full relative shadow-2xl" 
+              className="rounded-[3rem] p-10 max-w-lg w-full relative shadow-2xl border"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button onClick={() => setActiveBook(null)} className="absolute top-8 right-8 text-slate-300 hover:text-slate-600">
+              <button onClick={() => setActiveBook(null)} className="absolute top-8 right-8 transition-colors" style={{ color: 'var(--text-tertiary)' }}>
                 <X size={28} />
               </button>
-              <div className="p-4 bg-indigo-50 rounded-2xl w-fit text-indigo-600 mb-8">
+              <div className="p-4 rounded-2xl w-fit mb-8" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
                 <BookOpen size={30} />
               </div>
-              <h3 className="text-3xl font-black text-slate-900 mb-4">{activeBook.title}</h3>
-              <p className="text-slate-600 leading-relaxed text-xl font-medium">{activeBook.summary}</p>
+              <h3 className="text-3xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>{activeBook.title}</h3>
+              <p className="leading-relaxed text-xl font-medium" style={{ color: 'var(--text-primary)' }}>{activeBook.summary}</p>
             </motion.div>
           </div>
         )}

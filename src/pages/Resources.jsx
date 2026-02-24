@@ -146,17 +146,17 @@ export default function Resources() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-slate-50 border-b border-slate-100">
+      <section className="py-16 md:py-24 border-b" style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}>
         <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               Resource Hub & Expert Tips
             </h1>
-            <p className="text-xl text-slate-500 max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               Curated articles, exercises, and professional insights to help you manage academic stress and mental wellness. Verified sources only.
             </p>
           </motion.div>
@@ -165,7 +165,7 @@ export default function Resources() {
 
       {/* Doctor Tips Section */}
       {doctorTips.length > 0 && (
-        <section className="py-16 bg-gradient-to-b from-indigo-50 to-white border-b border-indigo-100">
+        <section className="py-16 border-b" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
           <div className="max-w-7xl mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -174,12 +174,12 @@ export default function Resources() {
               className="mb-8"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--primary-blue)' }}>
                   <Lightbulb size={24} className="text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900">Professional Tips from Our Doctors</h2>
+                <h2 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Professional Tips from Our Doctors</h2>
               </div>
-              <p className="text-slate-600">Practical advice and insights from licensed mental health professionals.</p>
+              <p style={{ color: 'var(--text-secondary)' }}>Practical advice and insights from licensed mental health professionals.</p>
             </motion.div>
 
             <motion.div
@@ -197,21 +197,22 @@ export default function Resources() {
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 }
                   }}
-                  className="bg-white border border-indigo-200 rounded-2xl p-6 hover:shadow-lg transition-shadow"
+                  className="border rounded-2xl p-6 hover:shadow-lg transition-shadow" 
+                  style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Stethoscope size={20} className="text-indigo-600" />
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
+                      <Stethoscope size={20} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-slate-900">{tip.doctorName}</h3>
-                      <p className="text-xs text-indigo-600 font-medium">{tip.doctorSpecialty}</p>
+                      <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>{tip.doctorName}</h3>
+                      <p className="text-xs font-medium" style={{ color: 'var(--primary-blue)' }}>{tip.doctorSpecialty}</p>
                     </div>
                   </div>
 
-                  <p className="text-slate-700 leading-relaxed mb-4">{tip.content}</p>
+                  <p className="leading-relaxed mb-4" style={{ color: 'var(--text-primary)' }}>{tip.content}</p>
 
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                     {new Date(tip.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
@@ -226,7 +227,7 @@ export default function Resources() {
       )}
 
       {/* Resources Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -234,8 +235,8 @@ export default function Resources() {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">External Resources & Tools</h2>
-            <p className="text-slate-600">Explore verified resources from trusted mental health organizations.</p>
+            <h2 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>External Resources & Tools</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>Explore verified resources from trusted mental health organizations.</p>
           </motion.div>
 
           <motion.div
@@ -255,28 +256,29 @@ export default function Resources() {
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 }
                   }}
-                  className="bg-white border border-slate-100 rounded-3xl p-6 hover:shadow-xl hover:border-indigo-100 transition-all cursor-pointer group flex flex-col"
+                  className="border rounded-3xl p-6 hover:shadow-xl transition-all cursor-pointer group flex flex-col" 
+                  style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                   onClick={() => openResource(resource.link)}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className={`p-3 rounded-2xl bg-gradient-to-br ${getTagColor(resource.tag).split(' ')[0]}`}>
                       <Icon className={`w-6 h-6 ${getTagColor(resource.tag).split(' ')[2]}`} />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
                       {resource.category}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-bold mb-2 group-hover:transition-colors" style={{ color: 'var(--text-primary)' }}>
                     {resource.title}
                   </h3>
-                  <p className="text-slate-500 text-sm mb-6 flex-grow">
+                  <p className="text-sm mb-6 flex-grow" style={{ color: 'var(--text-secondary)' }}>
                     {resource.description}
                   </p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${getTagColor(resource.tag)}`}>
                       {resource.tag}
                     </span>
-                    <ExternalLink size={18} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                    <ExternalLink size={18} className="transition-colors" style={{ color: 'var(--text-tertiary)' }} />
                   </div>
                 </motion.div>
               )

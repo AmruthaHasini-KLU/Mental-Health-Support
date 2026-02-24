@@ -65,10 +65,10 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-screen bg-slate-50 flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
         {/* Decorative elements */}
         <div className="absolute top-20 right-0 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-slate-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 opacity-20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" style={{ backgroundColor: 'var(--bg-tertiary)' }}></div>
         <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -83,18 +83,20 @@ export default function Home() {
             >
               {/* Badge */}
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-md rounded-full border border-slate-100"
+                className="inline-flex items-center gap-2 px-4 py-2 backdrop-blur-md rounded-full border"
+                style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
                 <Sparkles size={18} className="text-indigo-600" />
-                <span className="text-sm font-semibold text-slate-700">Your Mental Health Matters</span>
+                <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Your Mental Health Matters</span>
               </motion.div>
 
               {/* Main Headline */}
               <motion.h1
-                className="text-5xl md:text-7xl font-bold text-slate-900 leading-tight"
+                className="text-5xl md:text-7xl font-bold leading-tight"
+                style={{ color: 'var(--text-primary)' }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
@@ -106,7 +108,8 @@ export default function Home() {
 
               {/* Subheadline */}
               <motion.p
-                className="text-xl text-slate-500 max-w-xl"
+                className="text-xl max-w-xl"
+                style={{ color: 'var(--text-secondary)' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
@@ -123,14 +126,16 @@ export default function Home() {
               >
                 <button
                   onClick={() => navigate('/login')}
-                  className="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                  className="px-8 py-4 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'var(--primary-blue)' }}
                 >
                   <Heart size={20} />
                   Get Started
                 </button>
                 <button
                   onClick={() => navigate('/therapy')}
-                  className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl border border-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
+                  className="px-8 py-4 font-semibold rounded-xl border transition-colors flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'var(--card-bg)', color: 'var(--primary-blue)', borderColor: 'var(--primary-blue)' }}
                 >
                   <MessageCircle size={20} />
                   Schedule Session
@@ -139,22 +144,23 @@ export default function Home() {
 
               {/* Trust Metrics */}
               <motion.div
-                className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-200"
+                className="grid grid-cols-3 gap-6 pt-8 border-t"
+                style={{ borderColor: 'var(--border-color)' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
               >
                 <div>
                   <p className="text-3xl font-bold text-indigo-600">500+</p>
-                  <p className="text-sm text-slate-500">Students Supported</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Students Supported</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-indigo-600">24/7</p>
-                  <p className="text-sm text-slate-500">Crisis Support</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Crisis Support</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-indigo-600">50+</p>
-                  <p className="text-sm text-slate-500">Therapists</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Therapists</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -167,11 +173,12 @@ export default function Home() {
               transition={{ delay: 0.3, duration: 0.8 }}
             >
               <motion.div
-                className="relative w-80 h-80 bg-white border border-slate-100 rounded-3xl shadow-sm flex items-center justify-center"
+                className="relative w-80 h-80 rounded-3xl shadow-sm flex items-center justify-center border"
+                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
-                <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
                   <Activity size={64} className="text-indigo-600" />
                 </div>
               </motion.div>
@@ -181,7 +188,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 md:py-32 bg-white">
+      <section className="py-20 md:py-32" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <motion.div
@@ -191,10 +198,10 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               Comprehensive Mental Health Support
             </h2>
-            <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+            <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               Everything you need to prioritize your mental wellness in one place
             </p>
           </motion.div>
@@ -209,21 +216,23 @@ export default function Home() {
           >
             {/* Virtual Therapy Card */}
             <motion.div
-              className="group p-8 border border-slate-100 rounded-2xl hover:border-slate-200 transition-colors bg-white"
+              className="group p-8 border rounded-2xl transition-colors"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
               variants={itemVariants}
               whileHover={{ y: -10 }}
             >
               <motion.div
-                className="p-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit mb-6"
+                className="p-4 border rounded-2xl w-fit mb-6"
+                style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}
                 whileHover={{ scale: 1.1, rotate: 5 }}
               >
                 <Headphones className="text-indigo-600" size={32} />
               </motion.div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Virtual Therapy</h3>
-              <p className="text-slate-500 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Virtual Therapy</h3>
+              <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 Connect with licensed therapists via video, phone, or chat. Flexible scheduling to fit your lifestyle.
               </p>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <ul className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
                   Licensed professionals
@@ -241,21 +250,23 @@ export default function Home() {
 
             {/* Self-Help Resources Card */}
             <motion.div
-              className="group p-8 border border-slate-100 rounded-2xl hover:border-slate-200 transition-colors bg-white"
+              className="group p-8 border rounded-2xl transition-colors"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
               variants={itemVariants}
               whileHover={{ y: -10 }}
             >
               <motion.div
-                className="p-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit mb-6"
+                className="p-4 border rounded-2xl w-fit mb-6"
+                style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}
                 whileHover={{ scale: 1.1, rotate: 5 }}
               >
                 <BookOpen className="text-indigo-600" size={32} />
               </motion.div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Self-Help Resources</h3>
-              <p className="text-slate-500 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Self-Help Resources</h3>
+              <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 Access curated resources including articles, videos, meditation guides, and coping strategies.
               </p>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <ul className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
                   Evidence-based materials
@@ -273,21 +284,23 @@ export default function Home() {
 
             {/* Peer Support Card */}
             <motion.div
-              className="group p-8 border border-slate-100 rounded-2xl hover:border-slate-200 transition-colors bg-white"
+              className="group p-8 border rounded-2xl transition-colors"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
               variants={itemVariants}
               whileHover={{ y: -10 }}
             >
               <motion.div
-                className="p-4 bg-slate-50 border border-slate-100 rounded-2xl w-fit mb-6"
+                className="p-4 border rounded-2xl w-fit mb-6"
+                style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}
                 whileHover={{ scale: 1.1, rotate: 5 }}
               >
                 <Users className="text-indigo-600" size={32} />
               </motion.div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">Peer Support</h3>
-              <p className="text-slate-500 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Peer Support</h3>
+              <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 Join support groups and communities with others facing similar challenges. Build meaningful connections.
               </p>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <ul className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
                   Supportive community
@@ -310,7 +323,7 @@ export default function Home() {
       <MoodTracker />
 
       {/* Testimonials Section */}
-      <section className="py-20 md:py-32 bg-slate-50">
+      <section className="py-20 md:py-32" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <motion.div
@@ -320,10 +333,10 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               Trusted by Students Like You
             </h2>
-            <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+            <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               Read real reviews from students who've transformed their mental health journey
             </p>
           </motion.div>
@@ -339,7 +352,8 @@ export default function Home() {
             {/* Testimonial Card */}
             <motion.div
               key={currentTestimonial}
-              className="bg-white p-10 md:p-12 text-center border border-slate-100 rounded-2xl"
+              className="p-10 md:p-12 text-center border rounded-2xl"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -353,20 +367,20 @@ export default function Home() {
               </div>
 
               {/* Quote */}
-              <p className="text-xl text-slate-700 mb-8 leading-relaxed italic">
+              <p className="text-xl mb-8 leading-relaxed italic" style={{ color: 'var(--text-primary)' }}>
                 "{testimonials[currentTestimonial].content}"
               </p>
 
               {/* Avatar & Name */}
               <div className="flex flex-col items-center gap-3">
-                <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
-                  <User size={28} className="text-indigo-600" />
+                <div className="w-16 h-16 rounded-full border flex items-center justify-center" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)', color: 'var(--primary-blue)' }}>
+                  <User size={28} />
                 </div>
                 <div>
-                  <p className="font-bold text-lg text-slate-900">
+                  <p className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>
                     {testimonials[currentTestimonial].name}
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {testimonials[currentTestimonial].role}
                   </p>
                 </div>
@@ -377,7 +391,8 @@ export default function Home() {
             <div className="flex justify-center gap-4 mt-8">
               <motion.button
                 onClick={prevTestimonial}
-                className="p-3 bg-white rounded-full hover:bg-indigo-50 transition-colors border border-slate-100"
+                className="p-3 rounded-full transition-colors border"
+                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -385,7 +400,8 @@ export default function Home() {
               </motion.button>
               <motion.button
                 onClick={nextTestimonial}
-                className="p-3 bg-white rounded-full hover:bg-indigo-50 transition-colors border border-slate-100"
+                className="p-3 rounded-full transition-colors border"
+                style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -401,9 +417,12 @@ export default function Home() {
                   onClick={() => setCurrentTestimonial(index)}
                   className={`w-3 h-3 rounded-full transition-all ${
                     index === currentTestimonial
-                      ? 'bg-indigo-600 w-8'
-                      : 'bg-slate-300 hover:bg-slate-400'
+                      ? 'w-8'
+                      : ''
                   }`}
+                  style={{
+                    backgroundColor: index === currentTestimonial ? 'var(--primary-blue)' : 'var(--text-tertiary)'
+                  }}
                   whileHover={{ scale: 1.2 }}
                 />
               ))}
