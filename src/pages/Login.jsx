@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { Mail, Lock, User, Eye, EyeOff, Phone, AlertCircle, CheckCircle, RefreshCw, Sparkles } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Phone, AlertCircle, CheckCircle, RefreshCw, Sparkles, Shield, Users } from 'lucide-react'
 import { useCaptcha } from '../components/SimpleCaptcha'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Login() {
   const navigate = useNavigate()
   const { signup, login } = useAuth()
+  const { isDarkMode } = useTheme()
   
   const [isSignUp, setIsSignUp] = useState(false)
   const [userRole, setUserRole] = useState('student') // For login: 'student', 'doctor', or 'admin'
@@ -176,19 +178,24 @@ export default function Login() {
 
   return (
     <Layout>
-      <section className="min-h-screen bg-white">
+      <section className="min-h-screen transition-colors duration-300" style={{ backgroundColor: isDarkMode ? '#0f172a' : '#f1f5f9' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
           
-          {/* Left Side - Calming Nature Section */}
+          {/* Left Side - Professional Calm Study Space Illustration */}
           <motion.div 
-            className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700"
+            className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden bg-gradient-to-br transition-all duration-300"
+            style={{
+              background: isDarkMode 
+                ? 'linear-gradient(135deg, #1e293b 0%, #312e81 50%, #1e1b4b 100%)'
+                : 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%)'
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
             {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl -mr-48 -mt-48"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl -ml-48 -mb-48"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 opacity-10 rounded-full blur-3xl -mr-48 -mt-48" style={{ backgroundColor: isDarkMode ? '#ffffff' : '#6366f1' }}></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 opacity-10 rounded-full blur-3xl -ml-48 -mb-48" style={{ backgroundColor: isDarkMode ? '#ffffff' : '#6366f1' }}></div>
             
             {/* Logo/Branding */}
             <motion.div
@@ -198,78 +205,150 @@ export default function Login() {
               className="relative z-10"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <Sparkles size={24} className="text-primary-600" />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl backdrop-blur-lg border" style={{
+                  backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                  borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(99, 102, 241, 0.2)'
+                }}>
+                  <Sparkles size={24} style={{ color: isDarkMode ? '#a5b4fc' : '#6366f1' }} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">MindEase</h2>
-                  <p className="text-xs text-primary-100">Wellness Portal</p>
+                  <h2 className="text-2xl font-bold" style={{ color: isDarkMode ? '#ffffff' : '#1e293b' }}>MindEase</h2>
+                  <p className="text-xs" style={{ color: isDarkMode ? '#cbd5e1' : '#64748b' }}>Wellness Portal</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Center Content - Beautiful Nature-inspired Visual & Quote */}
+            {/* Center Content - Professional Study Space Illustration & Quote */}
             <motion.div
-              className="relative z-10 flex flex-col items-center justify-center py-12"
+              className="relative z-10 flex flex-col items-center justify-center py-8"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              {/* Nature Themed Illustration Container */}
-              <div className="relative w-64 h-64 mb-8">
-                {/* Circular gradient background simulating nature */}
-                <div className="absolute inset-0 bg-gradient-to-b from-primary-300 to-primary-600 rounded-full opacity-20 blur-2xl"></div>
+              {/* Professional Study Space SVG Illustration */}
+              <div className="relative w-80 h-80 mb-8">
+                {/* Ambient glow */}
+                <div className="absolute inset-0 bg-gradient-to-b opacity-20 rounded-3xl blur-3xl" style={{
+                  background: isDarkMode ? 'linear-gradient(to bottom, #818cf8, #6366f1)' : 'linear-gradient(to bottom, #6366f1, #4f46e5)'
+                }}></div>
                 
-                {/* Simple nature-inspired SVG illustration */}
-                <svg viewBox="0 0 200 200" className="w-full h-full relative z-10">
-                  {/* Sky */}
+                {/* Minimalist Calm Study Space SVG */}
+                <svg viewBox="0 0 300 300" className="w-full h-full relative z-10 drop-shadow-2xl">
                   <defs>
-                    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" style={{stopColor: '#e0f2ff', stopOpacity: 1}} />
-                      <stop offset="100%" style={{stopColor: '#b3e5fc', stopOpacity: 1}} />
+                    {/* Gradients for modern look */}
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" style={{stopColor: isDarkMode ? '#1e293b' : '#f8fafc', stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: isDarkMode ? '#0f172a' : '#e2e8f0', stopOpacity: 1}} />
                     </linearGradient>
-                    <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{stopColor: '#ffd54f', stopOpacity: 1}} />
-                      <stop offset="100%" style={{stopColor: '#ffb74d', stopOpacity: 1}} />
+                    <linearGradient id="deskGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" style={{stopColor: isDarkMode ? '#475569' : '#cbd5e1', stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: isDarkMode ? '#334155' : '#94a3b8', stopOpacity: 1}} />
+                    </linearGradient>
+                    <linearGradient id="laptopGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{stopColor: '#6366f1', stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: '#4f46e5', stopOpacity: 1}} />
+                    </linearGradient>
+                    <linearGradient id="plantGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" style={{stopColor: '#10b981', stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: '#059669', stopOpacity: 1}} />
                     </linearGradient>
                   </defs>
                   
-                  {/* Sky background */}
-                  <rect width="200" height="200" fill="url(#skyGradient)" />
+                  {/* Background - Calm Wall */}
+                  <rect width="300" height="300" fill="url(#bgGradient)" rx="20" />
                   
-                  {/* Sun */}
-                  <circle cx="170" cy="30" r="20" fill="url(#sunGradient)" />
+                  {/* Window with soft light */}
+                  <rect x="200" y="30" width="70" height="90" rx="8" fill={isDarkMode ? '#1e293b' : '#dbeafe'} opacity="0.6" />
+                  <rect x="205" y="35" width="30" height="85" rx="4" fill={isDarkMode ? '#334155' : '#93c5fd'} opacity="0.4" />
+                  <rect x="235" y="35" width="30" height="85" rx="4" fill={isDarkMode ? '#334155' : '#93c5fd'} opacity="0.4" />
+                  <line x1="220" y1="35" x2="220" y2="120" stroke={isDarkMode ? '#475569' : '#60a5fa'} strokeWidth="2" opacity="0.5" />
+                  <line x1="250" y1="35" x2="250" y2="120" stroke={isDarkMode ? '#475569' : '#60a5fa'} strokeWidth="2" opacity="0.5" />
+                  <line x1="205" y1="77" x2="265" y2="77" stroke={isDarkMode ? '#475569' : '#60a5fa'} strokeWidth="2" opacity="0.5" />
                   
-                  {/* Mountains */}
-                  <polygon points="0,140 60,80 120,130 200,70 200,200 0,200" fill="#10b981" opacity="0.8" />
-                  <polygon points="0,160 50,110 110,160 200,110 200,200 0,200" fill="#059669" opacity="0.7" />
+                  {/* Desk */}
+                  <rect x="40" y="180" width="220" height="15" rx="3" fill="url(#deskGradient)" />
+                  <rect x="45" y="195" width="8" height="80" rx="2" fill="url(#deskGradient)" />
+                  <rect x="247" y="195" width="8" height="80" rx="2" fill="url(#deskGradient)" />
                   
-                  {/* Trees */}
+                  {/* Laptop */}
+                  <g opacity="0.95">
+                    {/* Laptop base */}
+                    <rect x="100" y="160" width="100" height="3" rx="1.5" fill={isDarkMode ? '#64748b' : '#94a3b8'} />
+                    {/* Laptop screen */}
+                    <rect x="105" y="90" width="90" height="70" rx="4" fill="url(#laptopGradient)" />
+                    {/* Screen glow */}
+                    <rect x="110" y="95" width="80" height="60" rx="3" fill={isDarkMode ? '#1e293b' : '#e0e7ff'} opacity="0.9" />
+                    {/* Lines on screen simulating code/text */}
+                    <rect x="115" y="100" width="50" height="3" rx="1.5" fill="#6366f1" opacity="0.6" />
+                    <rect x="115" y="108" width="65" height="3" rx="1.5" fill="#6366f1" opacity="0.5" />
+                    <rect x="115" y="116" width="45" height="3" rx="1.5" fill="#6366f1" opacity="0.6" />
+                    <rect x="115" y="130" width="55" height="3" rx="1.5" fill="#8b5cf6" opacity="0.5" />
+                    <rect x="115" y="138" width="40" height="3" rx="1.5" fill="#8b5cf6" opacity="0.6" />
+                  </g>
+                  
+                  {/* Coffee mug */}
                   <g opacity="0.9">
-                    <polygon points="40,130 35,100 45,100" fill="#047857" />
-                    <rect x="38" y="130" width="4" height="15" fill="#6b4423" />
-                    
-                    <polygon points="160,140 155,115 165,115" fill="#047857" />
-                    <rect x="158" y="140" width="4" height="15" fill="#6b4423" />
+                    <rect x="210" y="155" width="25" height="20" rx="2" fill={isDarkMode ? '#475569' : '#94a3b8'} />
+                    <ellipse cx="222.5" cy="155" rx="12.5" ry="4" fill={isDarkMode ? '#334155' : '#64748b'} />
+                    <path d="M 235 160 Q 243 160 243 167 Q 243 174 235 174" stroke={isDarkMode ? '#475569' : '#94a3b8'} strokeWidth="2" fill="none" />
+                    {/* Steam */}
+                    <path d="M 215 145 Q 217 140 215 135" stroke="#94a3b8" strokeWidth="1.5" fill="none" opacity="0.6" strokeLinecap="round" />
+                    <path d="M 222 145 Q 224 138 222 133" stroke="#94a3b8" strokeWidth="1.5" fill="none" opacity="0.5" strokeLinecap="round" />
+                    <path d="M 229 145 Q 231 140 229 135" stroke="#94a3b8" strokeWidth="1.5" fill="none" opacity="0.6" strokeLinecap="round" />
+                  </g>
+                  
+                  {/* Potted plant */}
+                  <g opacity="0.95">
+                    <rect x="50" y="160" width="30" height="15" rx="2" fill={isDarkMode ? '#dc2626' : '#f87171'} />
+                    {/* Leaves */}
+                    <ellipse cx="55" cy="150" rx="6" ry="10" fill="url(#plantGradient)" transform="rotate(-20 55 150)" />
+                    <ellipse cx="65" cy="145" rx="7" ry="12" fill="url(#plantGradient)" transform="rotate(0 65 145)" />
+                    <ellipse cx="75" cy="150" rx="6" ry="10" fill="url(#plantGradient)" transform="rotate(20 75 150)" />
+                    <ellipse cx="60" cy="148" rx="5" ry="9" fill="#34d399" transform="rotate(-10 60 148)" opacity="0.8" />
+                    <ellipse cx="70" cy="148" rx="5" ry="9" fill="#34d399" transform="rotate(10 70 148)" opacity="0.8" />
+                  </g>
+                  
+                  {/* Book stack */}
+                  <g opacity="0.9">
+                    <rect x="240" y="168" width="18" height="4" rx="1" fill="#8b5cf6" />
+                    <rect x="238" y="164" width="22" height="4" rx="1" fill="#a78bfa" />
+                    <rect x="239" y="160" width="20" height="4" rx="1" fill="#c4b5fd" />
                   </g>
                 </svg>
               </div>
 
-              {/* Animated Quote */}
+              {/* Glassmorphism Quote Card */}
               <motion.div
                 key={currentQuoteIndex}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.8 }}
-                className="text-center"
+                className="text-center px-8 py-6 rounded-3xl backdrop-blur-xl border shadow-2xl"
+                style={{
+                  backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                  borderColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(99, 102, 241, 0.2)'
+                }}
               >
-                <p className="text-xl md:text-2xl font-light text-white mb-3 leading-relaxed italic">
+                <p className="text-lg md:text-xl font-medium mb-3 leading-relaxed" style={{ color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
                   "{quotes[currentQuoteIndex].text}"
                 </p>
-                <p className="text-sm text-primary-100">
+                <p className="text-sm mb-4" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                   — {quotes[currentQuoteIndex].author}
                 </p>
+                
+                {/* Trust Badges */}
+                <div className="flex items-center justify-center gap-4 pt-4 border-t" style={{ borderColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(99, 102, 241, 0.2)' }}>
+                  <div className="flex items-center gap-2">
+                    <Shield size={16} style={{ color: isDarkMode ? '#34d399' : '#10b981' }} />
+                    <span className="text-xs font-semibold" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>Verified by HealthSupport</span>
+                  </div>
+                  <div className="w-1 h-1 rounded-full" style={{ backgroundColor: isDarkMode ? '#475569' : '#cbd5e1' }}></div>
+                  <div className="flex items-center gap-2">
+                    <Users size={16} style={{ color: isDarkMode ? '#60a5fa' : '#3b82f6' }} />
+                    <span className="text-xs font-semibold" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>Community Driven</span>
+                  </div>
+                </div>
               </motion.div>
 
               {/* Quote Navigation Dots */}
@@ -278,9 +357,14 @@ export default function Login() {
                   <motion.button
                     key={index}
                     onClick={() => setCurrentQuoteIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentQuoteIndex ? 'bg-white w-6' : 'bg-primary-300'
-                    }`}
+                    className="rounded-full transition-all"
+                    style={{
+                      width: index === currentQuoteIndex ? '24px' : '8px',
+                      height: '8px',
+                      backgroundColor: index === currentQuoteIndex 
+                        ? (isDarkMode ? '#e2e8f0' : '#6366f1')
+                        : (isDarkMode ? '#475569' : '#cbd5e1')
+                    }}
                     whileHover={{ scale: 1.2 }}
                   />
                 ))}
@@ -292,16 +376,20 @@ export default function Login() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6 }}
-              className="text-sm text-primary-100 text-center relative z-10"
+              className="text-sm text-center relative z-10 font-medium"
+              style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
             >
-              Your journey to better mental health starts here
+              Your journey to better mental health starts here ✨
             </motion.p>
           </motion.div>
 
           {/* Right Side - Form Section */}
-          <div className="flex items-center justify-center p-6 sm:p-8 md:p-12 lg:p-12">
+          <div className="flex items-center justify-center p-6 sm:p-8 md:p-12 lg:p-12 transition-colors duration-300" style={{ backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }}>
             <div className="w-full max-w-md">
-              <motion.div className="card-base bg-white p-8 md:p-10 shadow-lg" variants={containerVariants} initial="hidden" animate="visible">
+              <motion.div className="card-base p-8 md:p-10 shadow-2xl backdrop-blur-sm border transition-colors duration-300" style={{
+                backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                borderColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(226, 232, 240, 0.8)'
+              }} variants={containerVariants} initial="hidden" animate="visible">
                 
                 {/* Success Message */}
                 {submitted && (
@@ -316,8 +404,8 @@ export default function Login() {
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{isSignUp ? 'Create Account' : 'Sign In'}</h1>
-                  <p className="text-gray-600 text-sm">MindEase Academic Wellness Portal</p>
+                  <h1 className="text-3xl font-bold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>{isSignUp ? 'Create Account' : 'Sign In'}</h1>
+                  <p className="text-sm transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>MindEase Academic Wellness Portal</p>
                 </div>
 
                 {/* Role Selector - Only show on login, not signup */}
@@ -375,8 +463,11 @@ export default function Login() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Sign-Up Role Selection */}
                   {isSignUp && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
-                      <label className="block text-sm font-semibold text-gray-900 mb-3">I am a...</label>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 rounded-xl border transition-colors duration-300" style={{
+                      background: isDarkMode ? 'linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))' : 'linear-gradient(to right, #eef2ff, #faf5ff)',
+                      borderColor: isDarkMode ? 'rgba(99, 102, 241, 0.3)' : '#c7d2fe'
+                    }}>
+                      <label className="block text-sm font-semibold mb-3 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>I am a...</label>
                       <div className="flex gap-3">
                         <label className="flex items-center gap-2 cursor-pointer flex-1">
                           <input
@@ -387,7 +478,7 @@ export default function Login() {
                             onChange={(e) => setSignupRole(e.target.value)}
                             className="w-4 h-4 cursor-pointer"
                           />
-                          <span className="text-sm font-medium text-gray-700">Student</span>
+                          <span className="text-sm font-medium transition-colors duration-300" style={{ color: isDarkMode ? '#cbd5e1' : '#374151' }}>Student</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer flex-1">
                           <input
@@ -398,10 +489,10 @@ export default function Login() {
                             onChange={(e) => setSignupRole(e.target.value)}
                             className="w-4 h-4 cursor-pointer"
                           />
-                          <span className="text-sm font-medium text-gray-700">Doctor</span>
+                          <span className="text-sm font-medium transition-colors duration-300" style={{ color: isDarkMode ? '#cbd5e1' : '#374151' }}>Doctor</span>
                         </label>
                       </div>
-                      <p className="text-xs text-gray-600 mt-2">
+                      <p className="text-xs mt-2 transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#6b7280' }}>
                         {signupRole === 'doctor' ? '💉 You will receive a doctor dashboard after verification.' : '👨‍🎓 You will get access to all wellness features.'}
                       </p>
                     </motion.div>
@@ -410,10 +501,14 @@ export default function Login() {
                   {/* Name Field */}
                   {isSignUp && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
+                      <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Full Name</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.name ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <User className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.name ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          borderColor: errors.name ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                          color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                        }} />
                       </div>
                       {errors.name && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.name}</p>}
                     </motion.div>
@@ -421,10 +516,14 @@ export default function Login() {
 
                   {/* Email Field */}
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: isSignUp ? 0.1 : 0, duration: 0.4 }}>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
+                    <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Email Address</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.email ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                      <Mail className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.email ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                        backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                        borderColor: errors.email ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                        color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                      }} />
                     </div>
                     {errors.email && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.email}</p>}
                   </motion.div>
@@ -432,10 +531,14 @@ export default function Login() {
                   {/* Phone Field */}
                   {isSignUp && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">Contact Number</label>
+                      <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Contact Number</label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.phone ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <Phone className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.phone ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          borderColor: errors.phone ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                          color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                        }} />
                       </div>
                       {errors.phone && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.phone}</p>}
                     </motion.div>
@@ -444,10 +547,14 @@ export default function Login() {
                   {/* Student ID Field - Only for Students */}
                   {isSignUp && signupRole === 'student' && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">Student ID</label>
+                      <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Student ID</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="e.g., STU-2024-001" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.studentId ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <User className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="e.g., STU-2024-001" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.studentId ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          borderColor: errors.studentId ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                          color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                        }} />
                       </div>
                       {errors.studentId && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.studentId}</p>}
                     </motion.div>
@@ -455,11 +562,15 @@ export default function Login() {
 
                   {/* Password Field */}
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: isSignUp ? 0.2 : 0.1, duration: 0.4 }}>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">Password</label>
+                    <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Password</label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.password ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                      <Lock className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.password ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                        backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                        borderColor: errors.password ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                        color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                      }} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }}>
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
@@ -469,11 +580,15 @@ export default function Login() {
                   {/* Confirm Password */}
                   {isSignUp && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">Confirm Password</label>
+                      <label className="block text-sm font-semibold mb-2 transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Confirm Password</label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.confirmPassword ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
-                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                        <Lock className="absolute left-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }} size={20} />
+                        <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none transition-all duration-300 ${errors.confirmPassword ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} style={{
+                          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                          borderColor: errors.confirmPassword ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db'),
+                          color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                        }} />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3.5 transition-colors duration-300" style={{ color: isDarkMode ? '#64748b' : '#9ca3af' }}>
                           {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
                       </div>
@@ -489,7 +604,7 @@ export default function Login() {
                     <motion.div className="flex items-center justify-between text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.4 }}>
                       <label className="flex items-center gap-2">
                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
-                        <span className="text-gray-600">Remember me</span>
+                        <span className="transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#6b7280' }}>Remember me</span>
                       </label>
                       <a href="#" className="text-primary-600 hover:text-primary-700 font-semibold transition-colors">Forgot Password?</a>
                     </motion.div>
@@ -499,9 +614,12 @@ export default function Login() {
                   {!isSignUp && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.4 }}>
                       <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-gray-900">Verify CAPTCHA</label>
+                        <label className="block text-sm font-semibold transition-colors duration-300" style={{ color: isDarkMode ? '#f1f5f9' : '#0f172a' }}>Verify CAPTCHA</label>
                         <div className="flex gap-3 items-center">
-                          <div className="flex-1 bg-gray-700 border-2 border-gray-900 rounded-lg p-4 font-bold text-3xl tracking-widest text-yellow-300 select-none flex items-center justify-center min-h-16 shadow-md">
+                          <div className="flex-1 border-2 rounded-lg p-4 font-bold text-3xl tracking-widest text-yellow-300 select-none flex items-center justify-center min-h-16 shadow-md transition-colors duration-300" style={{
+                            backgroundColor: isDarkMode ? '#334155' : '#374151',
+                            borderColor: isDarkMode ? '#475569' : '#1f2937'
+                          }}>
                             {captcha.captcha}
                           </div>
                           <button
@@ -528,13 +646,18 @@ export default function Login() {
                           onChange={captcha.handleInputChange}
                           placeholder="Enter the characters above"
                           maxLength="6"
-                          className={`w-full px-4 py-3 border-2 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all duration-300 ${
                             captcha.isValid
                               ? 'border-green-500 bg-green-50'
                               : captcha.userInput
                               ? 'border-red-500 bg-red-50'
-                              : 'border-gray-300'
+                              : ''
                           }`}
+                          style={{
+                            backgroundColor: captcha.isValid ? '#f0fdf4' : (captcha.userInput ? '#fef2f2' : (isDarkMode ? '#1e293b' : '#ffffff')),
+                            borderColor: captcha.isValid ? '#22c55e' : (captcha.userInput ? '#ef4444' : (isDarkMode ? '#334155' : '#d1d5db')),
+                            color: isDarkMode ? '#f1f5f9' : '#0f172a'
+                          }}
                         />
                         {captcha.isValid && (
                           <p className="text-green-600 text-sm font-semibold">✓ CAPTCHA verified</p>
@@ -563,9 +686,9 @@ export default function Login() {
 
                 {/* Divider */}
                 <motion.div className="flex items-center gap-3 my-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: isSignUp ? 0.5 : 0.4, duration: 0.4 }}>
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="text-sm text-gray-600">Or continue with</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <div className="flex-1 h-px transition-colors duration-300" style={{ backgroundColor: isDarkMode ? '#334155' : '#e5e7eb' }}></div>
+                  <span className="text-sm transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#6b7280' }}>Or continue with</span>
+                  <div className="flex-1 h-px transition-colors duration-300" style={{ backgroundColor: isDarkMode ? '#334155' : '#e5e7eb' }}></div>
                 </motion.div>
 
                 {/* Social Auth - Google Only */}
@@ -580,7 +703,12 @@ export default function Login() {
                     googleAuthUrl.searchParams.append('scope', 'openid email profile')
                     window.open(googleAuthUrl.toString(), '_blank', 'width=500,height=600')
                   }}
-                  className="w-full py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 font-semibold text-gray-700"
+                  className="w-full py-3 border rounded-xl transition-all duration-300 flex items-center justify-center gap-2 font-semibold"
+                  style={{
+                    borderColor: isDarkMode ? '#334155' : '#d1d5db',
+                    backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.5)' : '#ffffff',
+                    color: isDarkMode ? '#f1f5f9' : '#374151'
+                  }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: isSignUp ? 0.6 : 0.5, duration: 0.4 }}
@@ -595,7 +723,7 @@ export default function Login() {
                 </motion.button>
 
                 {/* Toggle SignUp/Login */}
-                <motion.p className="text-center text-gray-600 mt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: isSignUp ? 0.7 : 0.6, duration: 0.4 }}>
+                <motion.p className="text-center mt-6 transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#6b7280' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: isSignUp ? 0.7 : 0.6, duration: 0.4 }}>
                   {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
                   <button type="button" onClick={() => { setIsSignUp(!isSignUp); setErrors({}) }} className="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
                     {isSignUp ? 'Sign In' : 'Sign Up'}
@@ -604,7 +732,7 @@ export default function Login() {
 
                 {/* Terms */}
                 {isSignUp && (
-                  <motion.p className="text-xs text-gray-600 text-center mt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.4 }}>
+                  <motion.p className="text-xs text-center mt-4 transition-colors duration-300" style={{ color: isDarkMode ? '#94a3b8' : '#6b7280' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.4 }}>
                     By signing up, you agree to our <a href="#" className="text-primary-600 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-600 hover:underline">Privacy Policy</a>
                   </motion.p>
                 )}
