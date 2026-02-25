@@ -24,10 +24,13 @@ import {
   EyeOff
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
+import { supabase } from '../lib/supabase'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const { theme } = useTheme()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
@@ -97,7 +100,7 @@ export default function AdminDashboard() {
   const [doctorForm, setDoctorForm] = useState({ name: '', email: '', password: '', specialization: '' })
 
   // --- THERAPY REQUESTS STATE ---
-  const [therapyRequests, setTherapyRequests] = useState([
+  const defaultTherapyRequests = [
     {
       id: 1,
       studentName: 'Alex Kumar',
@@ -142,19 +145,74 @@ export default function AdminDashboard() {
       requestedDate: '2026-02-25',
       status: 'Pending'
     }
-  ])
+  ]
 
-  // Load therapy requests from localStorage on mount
+  const [therapyRequests, setTherapyRequests] = useState(defaultTherapyRequests)
+
+  const formatStatusLabel = (status) => {
+    if (!status) return 'Pending'
+    const normalized = status.toString().toLowerCase()
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+  }
+
+  const normalizeTherapyRequest = (row) => ({
+    id: row.id,
+    studentName: row.student_name || row.studentName || 'Student',
+    doctorName: row.doctor_name || row.doctorName || '',
+    contactNumber: row.student_contact || row.contactNumber || '',
+    numberOfPeople: row.attendees_count || row.numberOfPeople || 1,
+    issue: row.issue ?? 'Therapy Request',
+    severity: row.severity || 'Medium',
+    requestedDate: row.requested_date || row.requestedDate || '',
+    timeSlot: row.time_slot || row.timeSlot || '',
+    createdAt: row.created_at || row.createdAt || '',
+    status: formatStatusLabel(row.status ?? 'pending')
+  })
+
+  // Load therapy requests from Supabase (real-time) or localStorage fallback
   useEffect(() => {
-    const savedRequests = localStorage.getItem('therapy_requests')
-    if (savedRequests) {
-      const requests = JSON.parse(savedRequests)
-      if (requests.length > 0) {
-        // Merge with default data (keep both)
-        setTherapyRequests(prev => [...requests, ...prev])
+    if (!supabase) {
+      const savedRequests = localStorage.getItem('therapy_requests')
+      if (savedRequests) {
+        const requests = JSON.parse(savedRequests)
+        if (requests.length > 0) {
+          setTherapyRequests([...requests, ...defaultTherapyRequests])
+        }
       }
+      return
     }
-  }, [])
+
+    const fetchTherapyRequests = async () => {
+      const { data, error } = await supabase
+        .from('therapy_requests')
+        .select('*')
+
+      if (error) {
+        console.error('Failed to fetch therapy requests:', error)
+        return
+      }
+
+      const normalized = (data || []).map(normalizeTherapyRequest)
+      setTherapyRequests(normalized)
+    }
+
+    fetchTherapyRequests()
+
+    const channel = supabase
+      .channel('therapy-requests-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'therapy_requests' },
+        () => {
+          fetchTherapyRequests()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [theme])
 
   // Save stress busters to localStorage whenever they change
   useEffect(() => {
@@ -272,33 +330,64 @@ export default function AdminDashboard() {
   }
 
   // --- THERAPY REQUEST OPERATIONS ---
-  const acceptTherapyRequest = (id) => {
+  const updateTherapyRequest = async (id, updates) => {
+    if (!supabase) {
+      return
+    }
+
+    const { error } = await supabase
+      .from('therapy_requests')
+      .update(updates)
+      .eq('id', id)
+
+    if (error) {
+      console.error('Failed to update therapy request:', error)
+    }
+  }
+
+  const acceptTherapyRequest = async (id) => {
     setTherapyRequests(therapyRequests.map(req =>
       req.id === id ? { ...req, status: 'Scheduled' } : req
     ))
-    // Persist to localStorage
+
+    if (supabase) {
+      await updateTherapyRequest(id, { status: 'scheduled' })
+      return
+    }
+
     const allRequests = therapyRequests.map(req =>
       req.id === id ? { ...req, status: 'Scheduled' } : req
     )
     localStorage.setItem('therapy_requests', JSON.stringify(allRequests.filter(r => !r.issue || r.doctorName)))
   }
 
-  const rejectTherapyRequest = (id) => {
+  const rejectTherapyRequest = async (id) => {
     setTherapyRequests(therapyRequests.map(req =>
       req.id === id ? { ...req, status: 'Rejected' } : req
     ))
-    // Persist to localStorage
+
+    if (supabase) {
+      await updateTherapyRequest(id, { status: 'rejected' })
+      return
+    }
+
     const allRequests = therapyRequests.map(req =>
       req.id === id ? { ...req, status: 'Rejected' } : req
     )
     localStorage.setItem('therapy_requests', JSON.stringify(allRequests.filter(r => !r.issue || r.doctorName)))
   }
 
-  const assignRequestToDoctor = (requestId, doctorName) => {
+  const assignRequestToDoctor = async (requestId, doctorName) => {
     const updated = therapyRequests.map(req =>
       req.id === requestId ? { ...req, doctorName, status: 'Pending' } : req
     )
     setTherapyRequests(updated)
+
+    if (supabase) {
+      await updateTherapyRequest(requestId, { doctor_name: doctorName, status: 'pending' })
+      return
+    }
+
     localStorage.setItem('therapy_requests', JSON.stringify(updated))
   }
 
@@ -326,7 +415,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="flex">
         {/* SIDEBAR */}
         <motion.aside
@@ -420,14 +509,14 @@ export default function AdminDashboard() {
         {/* MAIN CONTENT */}
         <div className={`flex-1 ${sidebarOpen ? 'ml-72' : 'ml-0'} transition-all`}>
           {/* Top Bar */}
-          <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+          <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
             >
-              <Menu size={24} className="text-slate-700" />
+              <Menu size={24} className="text-slate-700 dark:text-slate-300" />
             </button>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'content' && 'Content Manager'}
               {activeTab === 'therapy' && 'Therapy Hub'}
@@ -447,44 +536,44 @@ export default function AdminDashboard() {
               >
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
-                        <Clipboard className="text-indigo-600" size={24} />
+                      <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
+                        <Clipboard className="text-indigo-600 dark:text-indigo-400" size={24} />
                       </div>
-                      <span className="text-2xl font-bold text-slate-900">{stats.totalRequests}</span>
+                      <span className="text-2xl font-bold text-slate-900 dark:text-white">{stats.totalRequests}</span>
                     </div>
-                    <h3 className="text-slate-600 font-medium">Total Requests</h3>
+                    <h3 className="text-slate-600 dark:text-slate-300 font-medium">Total Requests</h3>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <Users className="text-green-600" size={24} />
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                        <Users className="text-green-600 dark:text-green-400" size={24} />
                       </div>
-                      <span className="text-2xl font-bold text-slate-900">{stats.activeDoctors}</span>
+                      <span className="text-2xl font-bold text-slate-900 dark:text-white">{stats.activeDoctors}</span>
                     </div>
-                    <h3 className="text-slate-600 font-medium">Active Doctors</h3>
+                    <h3 className="text-slate-600 dark:text-slate-300 font-medium">Active Doctors</h3>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                        <Clock className="text-yellow-600" size={24} />
+                      <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
+                        <Clock className="text-yellow-600 dark:text-yellow-400" size={24} />
                       </div>
-                      <span className="text-2xl font-bold text-slate-900">{stats.pendingRequests}</span>
+                      <span className="text-2xl font-bold text-slate-900 dark:text-white">{stats.pendingRequests}</span>
                     </div>
-                    <h3 className="text-slate-600 font-medium">Pending Requests</h3>
+                    <h3 className="text-slate-600 dark:text-slate-300 font-medium">Pending Requests</h3>
                   </div>
 
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <CheckCircle className="text-blue-600" size={24} />
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                        <CheckCircle className="text-blue-600 dark:text-blue-400" size={24} />
                       </div>
-                      <span className="text-2xl font-bold text-slate-900">{stats.completedSessions}</span>
+                      <span className="text-2xl font-bold text-slate-900 dark:text-white">{stats.completedSessions}</span>
                     </div>
-                    <h3 className="text-slate-600 font-medium">Completed Sessions</h3>
+                    <h3 className="text-slate-600 dark:text-slate-300 font-medium">Completed Sessions</h3>
                   </div>
                 </div>
 
@@ -506,9 +595,9 @@ export default function AdminDashboard() {
                 className="space-y-6"
               >
                 {/* Stress Busters Section */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Stress Busters</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Stress Busters</h2>
                     <button
                       onClick={() => openContentModal('stress')}
                       className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -519,7 +608,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {stressBusters.map((item) => (
-                      <div key={item.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                      <div key={item.id} className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 border border-slate-200 dark:border-slate-600">
                         {item.imageUrl && (
                           <img
                             src={item.imageUrl}
@@ -527,19 +616,19 @@ export default function AdminDashboard() {
                             className="w-full h-32 object-cover rounded-lg mb-3"
                           />
                         )}
-                        <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                        <p className="text-sm text-slate-600 mb-3">{item.description}</p>
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">{item.description}</p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => openContentModal('stress', item)}
-                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white dark:bg-slate-600 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-500 transition-colors"
                           >
                             <Edit2 size={14} />
                             <span className="text-sm">Edit</span>
                           </button>
                           <button
                             onClick={() => deleteContent('stress', item.id)}
-                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white dark:bg-slate-600 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-700 rounded-lg hover:bg-red-50 dark:hover:bg-slate-500 transition-colors"
                           >
                             <Trash2 size={14} />
                             <span className="text-sm">Delete</span>
@@ -551,9 +640,9 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Yoga Techniques Section */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Yoga Techniques</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Yoga Techniques</h2>
                     <button
                       onClick={() => openContentModal('yoga')}
                       className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -564,7 +653,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {yogaTechniques.map((item) => (
-                      <div key={item.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                      <div key={item.id} className="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 border border-slate-200 dark:border-slate-600">
                         {item.imageUrl && (
                           <img
                             src={item.imageUrl}
@@ -572,19 +661,19 @@ export default function AdminDashboard() {
                             className="w-full h-32 object-cover rounded-lg mb-3"
                           />
                         )}
-                        <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                        <p className="text-sm text-slate-600 mb-3">{item.description}</p>
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">{item.description}</p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => openContentModal('yoga', item)}
-                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white dark:bg-slate-600 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-500 transition-colors"
                           >
                             <Edit2 size={14} />
                             <span className="text-sm">Edit</span>
                           </button>
                           <button
                             onClick={() => deleteContent('yoga', item.id)}
-                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white dark:bg-slate-600 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-700 rounded-lg hover:bg-red-50 dark:hover:bg-slate-500 transition-colors"
                           >
                             <Trash2 size={14} />
                             <span className="text-sm">Delete</span>
@@ -603,17 +692,17 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h2 className="text-xl font-bold text-slate-900 mb-6">Therapy Requests</h2>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Therapy Requests</h2>
                   <div className="space-y-3">
                     {therapyRequests.map((request) => (
                       <div
                         key={request.id}
-                        className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200"
+                        className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-bold text-slate-900">{request.studentName}</h3>
+                            <h3 className="font-bold text-slate-900 dark:text-white">{request.studentName}</h3>
                             <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getSeverityColor(request.severity)}`}>
                               {request.severity} Priority
                             </span>
@@ -621,36 +710,36 @@ export default function AdminDashboard() {
                               {request.status}
                             </span>
                           </div>
-                          <p className="text-sm text-slate-600 mb-1">
+                          <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
                             <span className="font-medium">Issue:</span> {request.issue}
                           </p>
                           {request.doctorName && (
-                            <p className="text-sm text-slate-600 mb-1">
+                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
                               <span className="font-medium">Assigned Doctor:</span> {request.doctorName}
                             </p>
                           )}
                           {request.contactNumber && (
-                            <p className="text-sm text-slate-600 mb-1">
+                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
                               <span className="font-medium">Contact:</span> {request.contactNumber}
                             </p>
                           )}
                           {request.numberOfPeople && (
-                            <p className="text-sm text-slate-600 mb-1">
+                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
                               <span className="font-medium">Attendees:</span> {request.numberOfPeople} {request.numberOfPeople === 1 ? 'person' : 'people'}
                             </p>
                           )}
                           {request.requestedDate && (
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                               <span className="font-medium">Date:</span> {new Date(request.requestedDate).toLocaleDateString()}
                             </p>
                           )}
                           {request.timeSlot && (
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                               <span className="font-medium">Time:</span> {request.timeSlot}
                             </p>
                           )}
                           {request.createdAt && (
-                            <p className="text-xs text-slate-400 mt-1">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                               Booked: {new Date(request.createdAt).toLocaleString()}
                             </p>
                           )}
@@ -663,7 +752,7 @@ export default function AdminDashboard() {
                               <select
                                 value={request.doctorName || ''}
                                 onChange={(e) => assignRequestToDoctor(request.id, e.target.value)}
-                                className="px-3 py-2 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="px-3 py-2 border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-slate-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                               >
                                 <option value="">Assign Doctor...</option>
                                 {doctors.filter(d => d.active).map(doctor => (
@@ -710,9 +799,9 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Doctor Accounts</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Doctor Accounts</h2>
                     <button
                       onClick={() => openDoctorModal()}
                       className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -724,27 +813,27 @@ export default function AdminDashboard() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-slate-200">
-                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700">Name</th>
-                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700">Email</th>
-                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700">Specialization</th>
-                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700">Status</th>
-                          <th className="text-right py-3 px-4 text-sm font-bold text-slate-700">Actions</th>
+                        <tr className="border-b border-slate-200 dark:border-slate-700">
+                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700 dark:text-slate-300">Name</th>
+                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700 dark:text-slate-300">Email</th>
+                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700 dark:text-slate-300">Specialization</th>
+                          <th className="text-left py-3 px-4 text-sm font-bold text-slate-700 dark:text-slate-300">Status</th>
+                          <th className="text-right py-3 px-4 text-sm font-bold text-slate-700 dark:text-slate-300">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {doctors.map((doctor) => (
-                          <tr key={doctor.id} className={`border-b border-slate-100 hover:bg-slate-50 ${!doctor.active ? 'opacity-60' : ''}`}>
+                          <tr key={doctor.id} className={`border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 ${!doctor.active ? 'opacity-60' : ''}`}>
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                                  <Stethoscope className="text-indigo-600" size={18} />
+                                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                                  <Stethoscope className="text-indigo-600 dark:text-indigo-400" size={18} />
                                 </div>
-                                <span className="font-medium text-slate-900">{doctor.name}</span>
+                                <span className="font-medium text-slate-900 dark:text-white">{doctor.name}</span>
                               </div>
                             </td>
-                            <td className="py-4 px-4 text-slate-600 text-sm">{doctor.email}</td>
-                            <td className="py-4 px-4 text-slate-600">{doctor.specialization}</td>
+                            <td className="py-4 px-4 text-slate-600 dark:text-slate-300 text-sm">{doctor.email}</td>
+                            <td className="py-4 px-4 text-slate-600 dark:text-slate-300">{doctor.specialization}</td>
                             <td className="py-4 px-4">
                               <span
                                 className={`px-3 py-1 rounded-lg text-xs font-medium ${
@@ -803,40 +892,40 @@ export default function AdminDashboard() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                 {editingContent ? 'Edit' : 'Add'} {contentType === 'stress' ? 'Stress Buster' : 'Yoga Technique'}
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Title</label>
                   <input
                     type="text"
                     value={contentForm.title}
                     onChange={(e) => setContentForm({ ...contentForm, title: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Enter title"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
                   <textarea
                     value={contentForm.description}
                     onChange={(e) => setContentForm({ ...contentForm, description: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                     rows="3"
                     placeholder="Enter description"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Image URL (optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Image URL (optional)</label>
                   <input
                     type="text"
                     value={contentForm.imageUrl}
                     onChange={(e) => setContentForm({ ...contentForm, imageUrl: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
@@ -854,7 +943,7 @@ export default function AdminDashboard() {
                     setContentForm({ title: '', description: '', imageUrl: '' })
                     setEditingContent(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+                  className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -872,52 +961,52 @@ export default function AdminDashboard() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                 {editingDoctor ? 'Edit Doctor' : 'Add Doctor'}
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
                   <input
                     type="text"
                     value={doctorForm.name}
                     onChange={(e) => setDoctorForm({ ...doctorForm, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Dr. John Smith"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email (dr.name@gmail.com)</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email (dr.name@gmail.com)</label>
                   <input
                     type="email"
                     value={doctorForm.email}
                     onChange={(e) => setDoctorForm({ ...doctorForm, email: e.target.value })}
                     disabled={editingDoctor ? true : false}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-slate-100"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-slate-100 dark:disabled:bg-slate-600"
                     placeholder="dr.john@gmail.com"
                   />
-                  <p className="text-xs text-slate-500 mt-1">Format: dr.{'{name}'}@gmail.com</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Format: dr.{'{name}'}@gmail.com</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Password</label>
                   <input
                     type="password"
                     value={doctorForm.password}
                     onChange={(e) => setDoctorForm({ ...doctorForm, password: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Secure password"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Specialization</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Specialization</label>
                   <input
                     type="text"
                     value={doctorForm.specialization}
                     onChange={(e) => setDoctorForm({ ...doctorForm, specialization: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="e.g., Anxiety & Depression"
                   />
                 </div>
@@ -935,7 +1024,7 @@ export default function AdminDashboard() {
                     setDoctorForm({ name: '', email: '', password: '', specialization: '' })
                     setEditingDoctor(null)
                   }}
-                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+                  className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>

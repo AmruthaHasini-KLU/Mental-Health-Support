@@ -475,7 +475,7 @@ export default function DoctorPortal() {
                       value={tipsInput}
                       onChange={(e) => setTipsInput(e.target.value)}
                       placeholder="Share a tip, thought, or advice for students (e.g., 'Managing exam stress: Break study sessions into 25-minute focused blocks...')"
-                      className="w-full p-4 border border-slate-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 resize-none"
+                      className="w-full p-4 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 resize-none"
                       rows="4"
                     />
                     <button

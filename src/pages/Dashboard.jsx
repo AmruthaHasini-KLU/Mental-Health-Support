@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Activity, BookOpen, Calendar, Timer, ChevronRight } from 'lucide-react'
@@ -94,6 +94,26 @@ export default function Dashboard() {
   const stressorTypes = ['Exams', 'Deadlines', 'Presentations', 'Projects', 'Financial', 'Personal/Family', 'Social/Peer Pressure', 'Health', 'Other']
   const stressLevels = ['Low', 'Moderate', 'High']
 
+  const loadStressors = () => {
+    const stored = JSON.parse(localStorage.getItem('student_stressors') || '[]')
+    if (Array.isArray(stored) && stored.length > 0) {
+      setStressors(stored)
+    }
+  }
+
+  useEffect(() => {
+    loadStressors()
+
+    const handleStorageChange = (event) => {
+      if (event.key === 'student_stressors') {
+        loadStressors()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   const handleFormChange = (event) => {
     const { name, value } = event.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -143,7 +163,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <section className="py-8 md:py-12 bg-slate-50 min-h-screen">
+      <section className="py-8 md:py-12 min-h-screen transition-colors duration-300" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Personalized Greeting Header */}
@@ -154,7 +174,7 @@ export default function Dashboard() {
             transition={{ duration: 0.5 }}
           >
             <div>
-              <p className="font-semibold text-sm mb-2" style={{ color: 'var(--primary-blue)' }}>Academic Stress Action Plan</p>
+              <p className="font-semibold text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Academic Stress Action Plan</p>
               <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>Hello {user.name}</h1>
               <p className="text-xl mt-2" style={{ color: 'var(--text-secondary)' }}>
                 Track stressors, apply Level 1 relief, and stay steady.
@@ -173,13 +193,13 @@ export default function Dashboard() {
               <div className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-3xl font-bold text-slate-900">Stress Tracker</h2>
-                    <p className="text-slate-500 mt-1">Log your academic stressors and apply Level 1 relief</p>
+                    <h2 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Stress Tracker</h2>
+                    <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Log your academic stressors and apply Level 1 relief</p>
                   </div>
                   <motion.button
                     onClick={() => navigate('/yoga')}
                     whileHover={{ scale: 1.05 }}
-                    className="px-6 py-2 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition-colors"
+                    className="px-6 py-2 border text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition-colors" style={{ borderColor: 'var(--primary-blue)' }}
                   >
                     Yoga & Relief Hub
                   </motion.button>
@@ -187,32 +207,30 @@ export default function Dashboard() {
 
                 <motion.form
                   onSubmit={handleAddStressor}
-                  className="grid grid-cols-1 gap-4 p-6 border border-slate-100 rounded-2xl bg-white mb-6"
+                  className="grid grid-cols-1 gap-4 p-6 border rounded-2xl mb-6 transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div className="md:col-span-2">
-                      <label className="text-sm font-semibold text-slate-700">Stressor</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Stressor</label>
                       <input
                         type="text"
                         name="title"
                         value={formData.title}
                         onChange={handleFormChange}
                         placeholder="Exams, deadlines, projects"
-                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
-                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Type</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Type</label>
                       <select
                         name="type"
                         value={formData.type}
                         onChange={handleFormChange}
-                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
-                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                       >
                         {stressorTypes.map((type) => (
                           <option key={type} value={type}>{type}</option>
@@ -220,13 +238,12 @@ export default function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Intensity</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Intensity</label>
                       <select
                         name="intensity"
                         value={formData.intensity}
                         onChange={handleFormChange}
-                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
-                        style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                       >
                         {stressLevels.map((level) => (
                           <option key={level} value={level}>{level}</option>
@@ -236,8 +253,8 @@ export default function Dashboard() {
                     <div className="flex items-end">
                       <button
                         type="submit"
-                        className="w-full px-4 py-2 text-white font-semibold rounded-xl transition-colors"
-                        style={{ backgroundColor: 'var(--primary-blue)' }}
+                        className="w-full px-4 py-2 text-white font-semibold rounded-xl transition-colors border"
+                        style={{ backgroundColor: 'var(--primary-blue)', borderColor: 'var(--primary-blue)' }}
                       >
                         Add Stressor
                       </button>
@@ -247,15 +264,14 @@ export default function Dashboard() {
                   {/* Custom Type Input - Shows when 'Other' is selected */}
                   {formData.type === 'Other' && (
                     <div className="mt-2">
-                      <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Specify custom stressor type</label>
+                      <label className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Specify custom stressor type</label>
                       <input
                         type="text"
                         name="customType"
                         value={formData.customType}
                         onChange={handleFormChange}
                         placeholder="e.g., Homesickness, Loneliness, Career uncertainty"
-                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 transition-colors"
-                        style={{ borderColor: 'var(--primary-blue)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+                        className="mt-2 w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                       />
                     </div>
                   )}
@@ -271,8 +287,7 @@ export default function Dashboard() {
                     <motion.div
                       key={stressor.id}
                       variants={itemVariants}
-                      className="p-6 border rounded-2xl transition-colors"
-                      style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                      className="p-6 border rounded-2xl transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                     >
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
@@ -281,7 +296,7 @@ export default function Dashboard() {
                             {stressor.type} · {stressor.intensity} · {stressor.createdAt}
                           </p>
                         </div>
-                        <span className="inline-flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--primary-blue)' }}>
+                        <span className="inline-flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1 text-indigo-600" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                           <Activity size={14} />
                           Level 1 Relief
                         </span>
@@ -293,11 +308,10 @@ export default function Dashboard() {
                           return (
                             <div
                               key={strategy.title}
-                              className="p-4 border rounded-xl transition-colors"
-                              style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+                              className="p-4 border rounded-xl transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                             >
                               <div className="flex items-center gap-2 font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                <StrategyIcon size={16} style={{ color: 'var(--primary-blue)' }} />
+                                <StrategyIcon size={16} className="text-indigo-600" />
                                 {strategy.title}
                               </div>
                               <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>{strategy.detail}</p>
@@ -311,13 +325,13 @@ export default function Dashboard() {
               </div>
 
               <motion.div
-                className="p-6 border border-slate-100 rounded-2xl bg-white h-fit"
+                className="p-6 border rounded-2xl h-fit transition-colors" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                 variants={itemVariants}
                 initial="hidden"
                 animate="visible"
               >
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Level 1 Relief Toolkit</h3>
-                <p className="text-slate-500 mb-6">
+                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Level 1 Relief Toolkit</h3>
+                <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
                   Quick resets to keep you steady during heavy academic weeks.
                 </p>
                 <div className="space-y-4">
@@ -329,12 +343,12 @@ export default function Dashboard() {
                     const ItemIcon = item.icon
                     return (
                       <div key={item.title} className="flex items-start gap-3">
-                        <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
+                        <div className="p-2 rounded-lg border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
                           <ItemIcon size={16} className="text-indigo-600" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-700">{item.title}</p>
-                          <p className="text-sm text-slate-500">{item.detail}</p>
+                          <p className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>{item.title}</p>
+                          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{item.detail}</p>
                         </div>
                       </div>
                     )}
@@ -342,7 +356,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => navigate('/yoga')}
-                  className="mt-6 w-full px-4 py-2 border border-indigo-600 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
+                  className="mt-6 w-full px-4 py-2 border text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2" style={{ borderColor: 'var(--primary-blue)', color: 'var(--primary-blue)' }}
                 >
                   Open Yoga & Relief Hub
                   <ChevronRight size={18} />

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Layout from '../layouts/Layout'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { supabase } from '../lib/supabase'
 
 const CATEGORIES = [
@@ -44,6 +45,7 @@ const CATEGORIES = [
 
 export default function Forums() {
   const { user } = useAuth()
+  const { theme } = useTheme()
   const [posts, setPosts] = useState([])
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showCreatePost, setShowCreatePost] = useState(false)
@@ -419,21 +421,24 @@ export default function Forums() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div
+        className="min-h-screen transition-colors duration-300"
+        style={{ backgroundColor: 'var(--bg-primary)' }}
+      >
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border-b border-slate-200"
+          className="border-b transition-colors duration-300" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
                   <MessageSquare className="text-primary-600" size={36} />
                   Peer Support Forum
                 </h1>
-                <p className="mt-2 text-slate-600">
+                <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>
                   Connect with fellow students, share experiences, and support each other
                 </p>
               </div>
@@ -448,7 +453,7 @@ export default function Forums() {
           </div>
         </motion.div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar - Categories */}
             <motion.div
@@ -456,10 +461,10 @@ export default function Forums() {
               animate={{ opacity: 1, x: 0 }}
               className="lg:col-span-1"
             >
-              <div className="bg-white rounded-2xl shadow-soft border border-slate-200 p-6 sticky top-4">
+              <div className="rounded-2xl shadow-soft border p-6 sticky top-4 transition-colors duration-300" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center gap-2 mb-4">
-                  <Filter size={20} className="text-slate-600" />
-                  <h2 className="font-semibold text-slate-900">Categories</h2>
+                  <Filter size={20} style={{ color: 'var(--text-secondary)' }} />
+                  <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>Categories</h2>
                 </div>
 
                 <div className="space-y-2">
@@ -467,9 +472,10 @@ export default function Forums() {
                     onClick={() => setSelectedCategory(null)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
                       selectedCategory === null
-                        ? 'bg-primary-100 text-primary-700 font-medium'
-                        : 'text-slate-600 hover:bg-slate-50'
+                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors'
                     }`}
+                    style={{ color: selectedCategory === null ? 'inherit' : 'var(--text-secondary)' }}
                   >
                     <div className="flex items-center gap-2">
                       <TrendingUp size={18} />
@@ -485,15 +491,16 @@ export default function Forums() {
                         onClick={() => setSelectedCategory(category.id)}
                         className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
                           selectedCategory === category.id
-                            ? 'bg-primary-100 text-primary-700 font-medium'
-                            : 'text-slate-600 hover:bg-slate-50'
+                            ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-700'
                         }`}
+                        style={{ color: selectedCategory === category.id ? 'inherit' : 'var(--text-secondary)' }}
                       >
                         <div className="flex items-center gap-2">
                           <Icon size={18} />
                           <span className="text-sm">{category.name}</span>
                         </div>
-                        <p className="text-xs mt-1 text-slate-500 ml-6">
+                        <p className="text-xs mt-1 ml-6" style={{ color: 'var(--text-secondary)' }}>
                           {category.description}
                         </p>
                       </button>
@@ -508,17 +515,17 @@ export default function Forums() {
               {loading ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                  <p className="mt-4 text-slate-600">Loading posts...</p>
+                  <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Loading posts...</p>
                 </div>
               ) : filteredPosts.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-12 bg-white rounded-2xl shadow-soft border border-slate-200"
+                  className="text-center py-12 rounded-2xl shadow-soft border transition-colors duration-300" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                 >
-                  <MessageSquare size={48} className="mx-auto text-slate-300 mb-4" />
-                  <h3 className="text-lg font-medium text-slate-900 mb-2">No posts yet</h3>
-                  <p className="text-slate-600 mb-6">
+                  <MessageSquare size={48} className="mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>No posts yet</h3>
+                  <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
                     Be the first to start a conversation in this category!
                   </p>
                   <button
@@ -539,7 +546,7 @@ export default function Forums() {
                     <motion.div
                       key={post.id}
                       variants={itemVariants}
-                      className="bg-white rounded-2xl shadow-soft border border-slate-200 p-6 hover:shadow-md transition-shadow"
+                      className="rounded-2xl shadow-soft border p-6 hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
                     >
                       {/* Post Header */}
                       <div className="flex items-start justify-between mb-4">
@@ -548,10 +555,10 @@ export default function Forums() {
                             <UserCircle size={24} />
                           </div>
                           <div>
-                            <p className="font-medium text-slate-900">
+                            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
                               {post.is_anonymous ? 'Anonymous' : post.author_name}
                             </p>
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                               <Clock size={14} />
                               <span>{formatTimeAgo(post.created_at)}</span>
                               <span className="w-1 h-1 rounded-full bg-slate-300"></span>
@@ -564,22 +571,23 @@ export default function Forums() {
                       </div>
 
                       {/* Post Content */}
-                      <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                      <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                         {post.title}
                       </h3>
-                      <p className="text-slate-700 mb-4 leading-relaxed">
+                      <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                         {post.content}
                       </p>
 
                       {/* Post Actions */}
-                      <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
+                      <div className="flex items-center gap-4 pt-4 border-t transition-colors duration-300" style={{ borderColor: 'var(--border-color)' }}>
                         <button
                           onClick={() => handleLikePost(post.id)}
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                             likedPosts.has(post.id)
-                              ? 'bg-red-50 text-red-600'
-                              : 'text-slate-600 hover:bg-slate-50'
+                              ? 'bg-red-50 dark:bg-red-900/20 text-red-600'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
                           }`}
+                          style={{ color: likedPosts.has(post.id) ? 'inherit' : 'var(--text-secondary)' }}
                         >
                           <Heart
                             size={18}
@@ -592,7 +600,7 @@ export default function Forums() {
 
                         <button
                           onClick={() => toggleReplies(post.id)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-50 transition-all"
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all" style={{ color: 'var(--text-secondary)' }}
                         >
                           <MessageSquare size={18} />
                           <span className="text-sm font-medium">
@@ -602,7 +610,7 @@ export default function Forums() {
 
                         <button
                           onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-all ml-auto"
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all ml-auto"
                         >
                           <Send size={18} />
                           <span className="text-sm font-medium">Reply</span>
@@ -616,7 +624,7 @@ export default function Forums() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 pt-4 border-t border-slate-100"
+                            className="mt-4 pt-4 border-t transition-colors duration-300" style={{ borderColor: 'var(--border-color)' }}
                           >
                             <div className="flex gap-3">
                               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sage-400 to-sage-600 flex items-center justify-center text-white flex-shrink-0">
@@ -627,7 +635,7 @@ export default function Forums() {
                                   value={replyContent}
                                   onChange={(e) => setReplyContent(e.target.value)}
                                   placeholder="Share your thoughts..."
-                                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                                   rows="3"
                                 />
                                 <div className="flex gap-2 mt-2">
@@ -642,7 +650,7 @@ export default function Forums() {
                                       setReplyingTo(null)
                                       setReplyContent('')
                                     }}
-                                    className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+                                    className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium" style={{ color: 'var(--text-secondary)' }}
                                   >
                                     Cancel
                                   </button>
@@ -660,23 +668,23 @@ export default function Forums() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="mt-4 pt-4 border-t border-slate-100 space-y-3"
+                            className="mt-4 pt-4 border-t space-y-3 transition-colors duration-300" style={{ borderColor: 'var(--border-color)' }}
                           >
                             {replies[post.id].map((reply) => (
-                              <div key={reply.id} className="flex gap-3 bg-slate-50 p-4 rounded-xl">
+                              <div key={reply.id} className="flex gap-3 p-4 rounded-xl transition-colors duration-300" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-calm-400 to-calm-600 flex items-center justify-center text-white flex-shrink-0">
                                   <UserCircle size={20} />
                                 </div>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <p className="font-medium text-slate-900 text-sm">
+                                    <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
                                       {reply.is_anonymous ? 'Anonymous' : reply.author_name}
                                     </p>
-                                    <span className="text-xs text-slate-500">
+                                    <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                                       {formatTimeAgo(reply.created_at)}
                                     </span>
                                   </div>
-                                  <p className="text-slate-700 text-sm">{reply.content}</p>
+                                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{reply.content}</p>
                                 </div>
                               </div>
                             ))}
@@ -706,28 +714,28 @@ export default function Forums() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-colors duration-300" style={{ backgroundColor: 'var(--card-bg)' }}
               >
-                <div className="p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white">
-                  <h2 className="text-2xl font-bold text-slate-900">Create New Post</h2>
+                <div className="p-6 border-b flex items-center justify-between sticky top-0" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Create New Post</h2>
                   <button
                     onClick={() => setShowCreatePost(false)}
-                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                   >
-                    <X size={24} className="text-slate-600" />
+                    <X size={24} style={{ color: 'var(--text-secondary)' }} />
                   </button>
                 </div>
 
                 <form onSubmit={handleCreatePost} className="p-6 space-y-5">
                   {/* Category Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       Category
                     </label>
                     <select
                       value={newPost.category}
                       onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                     >
                       {CATEGORIES.map((category) => (
                         <option key={category.id} value={category.id}>
@@ -739,7 +747,7 @@ export default function Forums() {
 
                   {/* Title */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       Title
                     </label>
                     <input
@@ -747,33 +755,33 @@ export default function Forums() {
                       value={newPost.title}
                       onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
                       placeholder="What's on your mind?"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
                       required
                     />
                   </div>
 
                   {/* Content */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       Content
                     </label>
                     <textarea
                       value={newPost.content}
                       onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                       placeholder="Share your thoughts, experiences, or questions..."
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                       rows="6"
                       required
                     />
                   </div>
 
                   {/* Anonymous Toggle */}
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                     <div className="flex items-center gap-3">
-                      <UserCircle size={24} className="text-slate-600" />
+                      <UserCircle size={24} className="text-slate-600 dark:text-slate-400" />
                       <div>
-                        <p className="font-medium text-slate-900">Post Anonymously</p>
-                        <p className="text-sm text-slate-600">
+                        <p className="font-medium text-slate-900 dark:text-white">Post Anonymously</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
                           Your identity will be hidden from other users
                         </p>
                       </div>

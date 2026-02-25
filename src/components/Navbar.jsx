@@ -81,7 +81,7 @@ export default function Navbar() {
           <div className="hidden md:flex gap-3 items-center">
             {user ? (
               <>
-                <p style={{ color: 'var(--text-primary)' }} className="font-medium">Welcome, {user.name}</p>
+                <p style={{ color: 'var(--text-primary)' }} className="font-medium text-sm truncate">Welcome, {user.name?.split(' ')[0]}</p>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors"

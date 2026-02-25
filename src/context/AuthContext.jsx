@@ -7,7 +7,12 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true)
 
   // Load user from localStorage on mount
-  const normalizeRole = (role) => (role || 'student').toString().toLowerCase() === 'admin' ? 'admin' : 'student'
+  const normalizeRole = (role, email) => {
+    const normalized = (role || 'student').toString().toLowerCase()
+    if (normalized === 'admin' && email === 'admin@gmail.com') return 'admin'
+    if (normalized === 'doctor') return 'doctor'
+    return 'student'
+  }
 
   useEffect(() => {
     // Initialize demo doctors if they don't exist
@@ -50,7 +55,7 @@ export function AuthProvider({ children }) {
       try {
         const parsedUser = JSON.parse(savedUser)
         if (parsedUser && parsedUser.email) {
-          setUser({ ...parsedUser, role: normalizeRole(parsedUser.role) })
+          setUser({ ...parsedUser, role: normalizeRole(parsedUser.role, parsedUser.email) })
         } else {
           localStorage.removeItem('healthsupport_user')
         }
@@ -65,7 +70,7 @@ export function AuthProvider({ children }) {
     if (user) {
       localStorage.setItem('healthsupport_user', JSON.stringify({
         ...user,
-        role: normalizeRole(user.role),
+        role: normalizeRole(user.role, user.email),
       }))
     } else {
       localStorage.removeItem('healthsupport_user')
@@ -146,21 +151,19 @@ export function AuthProvider({ children }) {
 
   const login = (email, password, role = 'student') => {
     const accounts = JSON.parse(localStorage.getItem('healthsupport_accounts') || '[]')
-    const normalizedRole = normalizeRole(role)
+    const normalizedRole = normalizeRole(role, email)
 
     // Check for admin credentials
     if (normalizedRole === 'admin') {
       const adminAccounts = [
         { email: 'admin@gmail.com', password: 'admin@888', role: 'admin' },
-        { email: 'admin@healthsupport.com', password: 'Admin@123', role: 'admin' },
-        { email: 'admin@mindease.com', password: 'AdminPass@2024', role: 'admin' },
       ]
       const admin = adminAccounts.find(acc => acc.email === email && acc.password === password)
       if (admin) {
         const userObject = {
           name: 'System Admin',
           email: admin.email,
-          role: normalizeRole('admin'),
+          role: normalizeRole('admin', admin.email),
           loginTime: new Date().toISOString(),
         }
         setUser(userObject)

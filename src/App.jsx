@@ -19,15 +19,15 @@ export default function App() {
   const { user, isLoading } = useAuth()
   const location = useLocation()
 
-  const normalizeRole = (role) => {
+  const normalizeRole = (role, email) => {
     if (!role) return 'student'
     const normalized = role.toString().toLowerCase()
-    if (normalized === 'admin') return 'admin'
+    if (normalized === 'admin' && email === 'admin@gmail.com') return 'admin'
     if (normalized === 'doctor') return 'doctor'
     return 'student'
   }
   
-  const hasRole = (role) => user && normalizeRole(user.role) === role
+  const hasRole = (role) => user && normalizeRole(user.role, user.email) === role
 
   // Check if current route is a student route
   const isStudentRoute = () => {
@@ -49,7 +49,7 @@ export default function App() {
       return <Navigate to="/login" replace />
     }
     if (allowedRole && !hasRole(allowedRole)) {
-      const redirectRole = normalizeRole(user.role)
+      const redirectRole = normalizeRole(user.role, user.email)
       const redirectPaths = {
         'admin': '/admin/dashboard',
         'doctor': '/doctor/dashboard',

@@ -150,7 +150,7 @@ export default function Login() {
           }, 1500)
         } else {
           // Call login function from AuthContext
-          login(formData.email, formData.password, userRole)
+          const loggedInUser = login(formData.email, formData.password, userRole)
           setSubmitted(true)
           const redirectPath = {
             'admin': '/admin/dashboard',
@@ -158,7 +158,7 @@ export default function Login() {
             'student': '/student/dashboard'
           }
           setTimeout(() => {
-            navigate(redirectPath[userRole] || '/student/dashboard')
+            navigate(redirectPath[loggedInUser?.role] || '/student/dashboard')
           }, 100)
         }
       } catch (err) {
@@ -422,7 +422,7 @@ export default function Login() {
                       <label className="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
                       <div className="relative">
                         <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.name ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.name ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                       </div>
                       {errors.name && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.name}</p>}
                     </motion.div>
@@ -433,7 +433,7 @@ export default function Login() {
                     <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.email ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.email ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                     </div>
                     {errors.email && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.email}</p>}
                   </motion.div>
@@ -444,7 +444,7 @@ export default function Login() {
                       <label className="block text-sm font-semibold text-gray-900 mb-2">Contact Number</label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.phone ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.phone ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                       </div>
                       {errors.phone && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.phone}</p>}
                     </motion.div>
@@ -456,7 +456,7 @@ export default function Login() {
                       <label className="block text-sm font-semibold text-gray-900 mb-2">Student ID</label>
                       <div className="relative">
                         <User className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="e.g., STU-2024-001" className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none transition-all ${errors.studentId ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="e.g., STU-2024-001" className={`w-full pl-10 pr-4 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.studentId ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                       </div>
                       {errors.studentId && <p className="text-red-600 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} /> {errors.studentId}</p>}
                     </motion.div>
@@ -467,7 +467,7 @@ export default function Login() {
                     <label className="block text-sm font-semibold text-gray-900 mb-2">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none transition-all ${errors.password ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.password ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
@@ -481,7 +481,7 @@ export default function Login() {
                       <label className="block text-sm font-semibold text-gray-900 mb-2">Confirm Password</label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3.5 text-gray-400" size={20} />
-                        <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none transition-all ${errors.confirmPassword ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
+                        <input type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${errors.confirmPassword ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'}`} />
                         <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
                           {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
@@ -537,7 +537,7 @@ export default function Login() {
                           onChange={captcha.handleInputChange}
                           placeholder="Enter the characters above"
                           maxLength="6"
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-all ${
+                          className={`w-full px-4 py-3 border-2 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all ${
                             captcha.isValid
                               ? 'border-green-500 bg-green-50'
                               : captcha.userInput

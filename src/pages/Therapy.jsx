@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '../layouts/Layout'
 import { User, Phone, Users, X, ArrowRight, BookOpen, Check, Sparkles, ShoppingCart, Bookmark, Clock } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 export default function Therapy() {
   const [selectedTherapist, setSelectedTherapist] = useState(null)
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [bookingSubmitting, setBookingSubmitting] = useState(false)
   const [activeBook, setActiveBook] = useState(null)
   const [therapists, setTherapists] = useState([])
   
@@ -21,8 +23,8 @@ export default function Therapy() {
     timeSlot: ''
   })
 
-  // Load doctors dynamically from localStorage
-  useEffect(() => {
+  // Load doctors dynamically from localStorage - refresh when page becomes visible or storage changes
+  const loadDoctors = () => {
     const doctors = JSON.parse(localStorage.getItem('healthsupport_doctors') || '[]')
     const activeDoctors = doctors
       .filter(doc => doc.active)
@@ -42,6 +44,33 @@ export default function Therapy() {
     } else {
       setTherapists(activeDoctors)
     }
+  }
+
+  // Load doctors on mount and when page becomes visible
+  useEffect(() => {
+    loadDoctors()
+
+    // Listen for visibility changes to reload doctors when user returns to the page
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadDoctors()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
+  // Listen for storage changes (when admin adds a new doctor in another tab/window)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'healthsupport_doctors') {
+        loadDoctors()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
   const famousBooks = [
@@ -95,33 +124,58 @@ export default function Therapy() {
     setShowBookingModal(true)
   }
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (!bookingForm.contactNumber || !bookingForm.numberOfPeople || !bookingForm.requestedDate || !bookingForm.timeSlot) {
       return
     }
 
-    // Save to therapy_requests (would integrate with backend/localStorage)
-    const therapyRequest = {
-      id: Date.now(),
-      studentName: bookingForm.studentName,
-      doctorName: bookingForm.doctorName,
-      contactNumber: bookingForm.contactNumber,
-      numberOfPeople: bookingForm.numberOfPeople,
-      issue: bookingForm.issue,
-      severity: bookingForm.severity,
-      requestedDate: bookingForm.requestedDate,
-      timeSlot: bookingForm.timeSlot,
-      createdAt: new Date().toISOString(),
-      status: 'Pending'
+    setBookingSubmitting(true)
+
+    const payload = {
+      doctor_name: bookingForm.doctorName,
+      student_contact: bookingForm.contactNumber,
+      attendees_count: bookingForm.numberOfPeople,
+      status: 'pending'
     }
-    
-    // Save to localStorage for admin to see
-    const existingRequests = JSON.parse(localStorage.getItem('therapy_requests') || '[]')
-    existingRequests.push(therapyRequest)
-    localStorage.setItem('therapy_requests', JSON.stringify(existingRequests))
-    
-    setShowBookingModal(false)
-    setBookingSuccess(true)
+
+    if (supabase) {
+      const { error } = await supabase
+        .from('therapy_requests')
+        .insert(payload)
+
+      if (error) {
+        console.error('Failed to create therapy request:', error)
+        setBookingSubmitting(false)
+        return
+      }
+      // Only show success after database confirms (no error)
+      setShowBookingModal(false)
+      setBookingSuccess(true)
+      setBookingSubmitting(false)
+    } else {
+      const therapyRequest = {
+        id: Date.now(),
+        studentName: bookingForm.studentName,
+        doctorName: bookingForm.doctorName,
+        contactNumber: bookingForm.contactNumber,
+        numberOfPeople: bookingForm.numberOfPeople,
+        issue: bookingForm.issue,
+        severity: bookingForm.severity,
+        requestedDate: bookingForm.requestedDate,
+        timeSlot: bookingForm.timeSlot,
+        createdAt: new Date().toISOString(),
+        status: 'Pending'
+      }
+
+      const existingRequests = JSON.parse(localStorage.getItem('therapy_requests') || '[]')
+      existingRequests.push(therapyRequest)
+      localStorage.setItem('therapy_requests', JSON.stringify(existingRequests))
+      
+      // Show success for localStorage (synchronous operation)
+      setShowBookingModal(false)
+      setBookingSuccess(true)
+      setBookingSubmitting(false)
+    }
     
     // Reset form after 3 seconds
     setTimeout(() => {
@@ -308,11 +362,11 @@ export default function Therapy() {
 
                 <button 
                   onClick={handleConfirmBooking}
-                  disabled={!bookingForm.contactNumber || bookingForm.numberOfPeople < 1 || !bookingForm.requestedDate || !bookingForm.timeSlot}
+                  disabled={bookingSubmitting || !bookingForm.contactNumber || bookingForm.numberOfPeople < 1 || !bookingForm.requestedDate || !bookingForm.timeSlot}
                   className="w-full py-4 rounded-2xl font-black shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   style={{ backgroundColor: 'var(--primary-blue)', color: '#fff' }}
                 >
-                  Confirm Booking
+                  {bookingSubmitting ? 'Confirming...' : 'Confirm Booking'}
                 </button>
               </motion.div>
             </div>
