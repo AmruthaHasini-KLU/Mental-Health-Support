@@ -359,15 +359,6 @@ export default function Login() {
                   </motion.div>
                 )}
 
-                {/* Admin Credentials Hint */}
-                {!isSignUp && userRole === 'admin' && (
-                  <motion.div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <p className="text-xs text-blue-700 font-semibold">Demo Admin Credentials:</p>
-                    <p className="text-xs text-blue-600 mt-1">Email: admin@healthsupport.com</p>
-                    <p className="text-xs text-blue-600">Password: Admin@123</p>
-                  </motion.div>
-                )}
-
                 {/* Doctor Credentials Hint */}
                 {!isSignUp && userRole === 'doctor' && (
                   <motion.div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl space-y-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

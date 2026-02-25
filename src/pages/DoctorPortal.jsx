@@ -213,7 +213,7 @@ export default function DoctorPortal() {
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-auto p-6 bg-white dark:bg-[#0f172a]">
             {/* DASHBOARD TAB */}
             {activeTab === 'dashboard' && (
               <motion.div
@@ -375,14 +375,14 @@ export default function DoctorPortal() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => acceptRequest(request.id)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap border border-blue-700 dark:border-blue-500"
                           >
                             <Check size={16} />
                             <span className="hidden sm:inline">Accept</span>
                           </button>
                           <button
                             onClick={() => rejectRequest(request.id)}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm whitespace-nowrap"
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm whitespace-nowrap border border-red-700 dark:border-red-500"
                           >
                             <XCircle size={16} />
                             <span className="hidden sm:inline">Reject</span>

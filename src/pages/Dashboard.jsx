@@ -175,7 +175,7 @@ export default function Dashboard() {
           >
             <div>
               <p className="font-semibold text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Academic Stress Action Plan</p>
-              <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>Hello {user.name}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Hello {user.name}</h1>
               <p className="text-xl mt-2" style={{ color: 'var(--text-secondary)' }}>
                 Track stressors, apply Level 1 relief, and stay steady.
               </p>

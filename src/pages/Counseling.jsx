@@ -17,7 +17,7 @@ export default function Counseling() {
 
   const therapists = [
     { id: 1, name: 'Dr. Aisha Rahman', specialty: 'Academic Burnout Specialist', availability: ['Feb 25 - 10:00 AM', 'Feb 26 - 11:00 AM'] },
-    { id: 2, name: 'Dr. Luis Moreno', specialty: 'High-Anxiety & Triage Lead', availability: ['Feb 26 - 09:00 AM', 'Feb 27 - 01:00 PM'] },
+    { id: 2, name: 'Dr. Luis Moreno', specialty: 'High-Anxiety & Therapy Lead', availability: ['Feb 26 - 09:00 AM', 'Feb 27 - 01:00 PM'] },
     { id: 3, name: 'Dr. Hannah Park', specialty: 'Clinical Sleep Specialist', availability: ['Feb 26 - 03:00 PM', 'Feb 28 - 10:00 AM'] }
   ]
 
@@ -83,12 +83,12 @@ export default function Counseling() {
           
           <header className="mb-16 text-center">
              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest mb-4">
-              <Sparkles size={14} /> Care Triage Hub
+              <Sparkles size={14} /> Care Therapy Hub
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Support Triage & Wisdom</h1>
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Support Therapy & Wisdom</h1>
           </header>
 
-          {/* 1. CARE TRIAGE SECTION */}
+          {/* 1. CARE THERAPY SECTION */}
           <div className="grid md:grid-cols-3 gap-8 mb-24">
             {therapists.map((dr) => (
               <div key={dr.id} className={`bg-white border-2 rounded-[2.5rem] p-8 transition-all h-fit ${selectedTherapist === dr.id ? 'border-indigo-500 shadow-xl' : 'border-slate-100 shadow-sm'}`}>

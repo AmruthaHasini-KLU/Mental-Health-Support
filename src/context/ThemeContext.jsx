@@ -11,84 +11,30 @@ export const useTheme = () => {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    // Force cleanup any stale dark class on app load
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('dark')
-      document.body.classList.remove('dark')
-      document.documentElement.removeAttribute('data-theme')
-      document.body.removeAttribute('data-theme')
-    }
+  const [theme, setTheme] = useState('light')
 
-    // Check localStorage first
-    const saved = localStorage.getItem('theme')
-    if (saved) return saved
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
-    }
-    return 'light'
-  })
-
-  // Apply theme to document immediately
+  // Initialize theme on mount
   useEffect(() => {
-    const root = document.documentElement
-    const body = document.body
+    // Always start in light mode - remove dark class
+    document.documentElement.classList.remove('dark')
+    localStorage.setItem('theme', 'light')
+  }, [])
+
+  // Apply theme to document
+  useEffect(() => {
     const isDark = theme === 'dark'
-
-    // Force removal of dark class before applying
-    root.classList.remove('dark')
-    body.classList.remove('dark')
-    root.removeAttribute('data-theme')
-    body.removeAttribute('data-theme')
-
-    // Then apply based on theme
     if (isDark) {
-      root.classList.add('dark')
-      body.classList.add('dark')
-      root.setAttribute('data-theme', 'dark')
-      body.setAttribute('data-theme', 'dark')
+      document.documentElement.classList.add('dark')
+      document.documentElement.setAttribute('data-theme', 'dark')
     } else {
-      // Explicitly remove attributes in light mode
-      root.removeAttribute('data-theme')
-      body.removeAttribute('data-theme')
+      document.documentElement.classList.remove('dark')
+      document.documentElement.setAttribute('data-theme', 'light')
     }
-
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  // Listen to system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleSystemThemeChange = (e) => {
-      const saved = localStorage.getItem('theme')
-      // Only auto-switch if user hasn't manually set a preference
-      if (!saved) {
-        setTheme(e.matches ? 'dark' : 'light')
-      }
-    }
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange)
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange)
-  }, [])
-
   const toggleTheme = () => {
-    setTheme((prev) => {
-      const newTheme = prev === 'light' ? 'dark' : 'light'
-      // Force immediate DOM update
-      const isDark = newTheme === 'dark'
-      document.documentElement.classList.remove('dark')
-      document.body.classList.remove('dark')
-      document.documentElement.removeAttribute('data-theme')
-      document.body.removeAttribute('data-theme')
-      if (isDark) {
-        document.documentElement.classList.add('dark')
-        document.body.classList.add('dark')
-        document.documentElement.setAttribute('data-theme', 'dark')
-        document.body.setAttribute('data-theme', 'dark')
-      }
-      return newTheme
-    })
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
 
   const value = {

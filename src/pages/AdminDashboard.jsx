@@ -169,48 +169,62 @@ export default function AdminDashboard() {
     status: formatStatusLabel(row.status ?? 'pending')
   })
 
-  // Load therapy requests from Supabase (real-time) or localStorage fallback
+  // Load therapy requests from Supabase (real-time) and localStorage
   useEffect(() => {
-    if (!supabase) {
-      const savedRequests = localStorage.getItem('therapy_requests')
-      if (savedRequests) {
-        const requests = JSON.parse(savedRequests)
-        if (requests.length > 0) {
-          setTherapyRequests([...requests, ...defaultTherapyRequests])
+    const fetchTherapyRequests = async () => {
+      let allRequests = []
+
+      // Fetch from Supabase if available
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('therapy_requests')
+          .select('*')
+
+        if (!error && data) {
+          const normalized = data.map(normalizeTherapyRequest)
+          allRequests = allRequests.concat(normalized)
         }
       }
-      return
-    }
 
-    const fetchTherapyRequests = async () => {
-      const { data, error } = await supabase
-        .from('therapy_requests')
-        .select('*')
-
-      if (error) {
-        console.error('Failed to fetch therapy requests:', error)
-        return
+      // Also fetch from localStorage to catch recent bookings
+      const savedRequests = localStorage.getItem('therapy_requests')
+      if (savedRequests) {
+        try {
+          const localRequests = JSON.parse(savedRequests)
+          if (Array.isArray(localRequests)) {
+            const normalized = localRequests.map(normalizeTherapyRequest)
+            // Avoid duplicates - only add if not already in allRequests
+            const existingIds = new Set(allRequests.map(r => r.id))
+            const uniqueLocal = normalized.filter(r => !existingIds.has(r.id))
+            allRequests = allRequests.concat(uniqueLocal)
+          }
+        } catch (e) {
+          console.error('Error parsing localStorage therapy requests:', e)
+        }
       }
 
-      const normalized = (data || []).map(normalizeTherapyRequest)
-      setTherapyRequests(normalized)
+      // Set combined results or defaults
+      setTherapyRequests(allRequests.length > 0 ? allRequests : defaultTherapyRequests)
     }
 
     fetchTherapyRequests()
 
-    const channel = supabase
-      .channel('therapy-requests-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'therapy_requests' },
-        () => {
-          fetchTherapyRequests()
-        }
-      )
-      .subscribe()
+    // Set up Supabase real-time subscription if available
+    if (supabase) {
+      const channel = supabase
+        .channel('therapy-requests-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'therapy_requests' },
+          () => {
+            fetchTherapyRequests()
+          }
+        )
+        .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
+      return () => {
+        supabase.removeChannel(channel)
+      }
     }
   }, [theme])
 
@@ -526,7 +540,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Content Area */}
-          <div className="p-6">
+          <div className="p-6 bg-white dark:bg-[#0f172a]">
             {/* DASHBOARD TAB */}
             {activeTab === 'dashboard' && (
               <motion.div
@@ -764,14 +778,14 @@ export default function AdminDashboard() {
                               <div className="flex gap-1">
                                 <button
                                   onClick={() => acceptTherapyRequest(request.id)}
-                                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium border border-blue-700 dark:border-blue-500"
                                 >
                                   <Check size={14} />
                                   Accept
                                 </button>
                                 <button
                                   onClick={() => rejectTherapyRequest(request.id)}
-                                  className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                  className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium border border-red-700 dark:border-red-500"
                                 >
                                   <X size={14} />
                                   Reject
@@ -823,7 +837,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody>
                         {doctors.map((doctor) => (
-                          <tr key={doctor.id} className={`border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 ${!doctor.active ? 'opacity-60' : ''}`}>
+                          <tr key={doctor.id} className={`border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 ${!doctor.active ? 'opacity-60' : ''}`}>
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">

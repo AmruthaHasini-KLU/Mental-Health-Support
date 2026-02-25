@@ -635,7 +635,7 @@ export default function Forums() {
                                   value={replyContent}
                                   onChange={(e) => setReplyContent(e.target.value)}
                                   placeholder="Share your thoughts..."
-                                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                                   rows="3"
                                 />
                                 <div className="flex gap-2 mt-2">
@@ -735,7 +735,7 @@ export default function Forums() {
                     <select
                       value={newPost.category}
                       onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-slate-900 dark:text-white" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                     >
                       {CATEGORIES.map((category) => (
                         <option key={category.id} value={category.id}>
@@ -755,7 +755,7 @@ export default function Forums() {
                       value={newPost.title}
                       onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
                       placeholder="What's on your mind?"
-                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)' }}
+                      className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--card-bg)' }}
                       required
                     />
                   </div>
