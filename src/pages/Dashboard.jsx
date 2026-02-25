@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Activity, BookOpen, Calendar, Timer, ChevronRight } from 'lucide-react'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { useAuth } from '../context/AuthContext'
 
 export default function Dashboard() {
@@ -366,6 +367,9 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </section>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

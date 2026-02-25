@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import MoodTracker from '../components/MoodTracker'
+import AIAssistant from '../components/AIAssistant'
 import { Activity, Heart, Sparkles, Users, MessageCircle, Headphones, BookOpen, ChevronLeft, ChevronRight, Star, User } from 'lucide-react'
 
 export default function Home() {
@@ -466,6 +467,9 @@ export default function Home() {
           </motion.button>
         </div>
       </section>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

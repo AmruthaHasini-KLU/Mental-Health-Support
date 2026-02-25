@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { User, Calendar, Clock, Bookmark, X, ArrowRight, BookOpen, Check, Sparkles, ShoppingCart, ThumbsUp } from 'lucide-react'
 
 export default function Counseling() {
@@ -191,6 +192,9 @@ export default function Counseling() {
           </div>
         )}
       </div>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

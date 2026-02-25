@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { BookOpen, Music, FileText, Video, Zap, Heart, ExternalLink, Lightbulb, Stethoscope } from 'lucide-react'
 
 export default function Resources() {
@@ -286,6 +287,9 @@ export default function Resources() {
           </motion.div>
         </div>
       </section>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

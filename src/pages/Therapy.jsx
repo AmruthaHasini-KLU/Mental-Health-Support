@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { User, Phone, Users, X, ArrowRight, BookOpen, Check, Sparkles, ShoppingCart, Bookmark, Clock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -425,6 +426,9 @@ export default function Therapy() {
           </div>
         )}
       </div>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

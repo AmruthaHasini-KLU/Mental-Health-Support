@@ -15,6 +15,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { supabase } from '../lib/supabase'
@@ -823,6 +824,9 @@ export default function Forums() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }

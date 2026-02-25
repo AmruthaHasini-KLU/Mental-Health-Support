@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import Layout from '../layouts/Layout'
+import AIAssistant from '../components/AIAssistant'
 import { Users, Calendar, MapPin, MessageSquare, Heart, TrendingUp } from 'lucide-react'
 
 export default function SupportGroups() {
@@ -251,6 +252,9 @@ export default function SupportGroups() {
           </motion.div>
         </div>
       </section>
+
+      {/* AI Wellness Assistant */}
+      <AIAssistant />
     </Layout>
   )
 }
